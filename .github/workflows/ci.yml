@@ -1,0 +1,147 @@
+name: CI
+
+# Executa em todo PR aberto/atualizado contra main ou master
+# e em pushes diretos a essas branches
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+# Cancela execuções anteriores do mesmo PR ao receber novo push
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+# ============================================================================
+# Jobs executam em paralelo
+# ============================================================================
+jobs:
+
+  # --------------------------------------------------------------------------
+  # JOB 1 — Formatação (Prettier)
+  # Leve e rápido — falha imediatamente se algum arquivo não estiver formatado
+  # --------------------------------------------------------------------------
+  format:
+    name: Format check (Prettier)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check formatting
+        run: yarn format:check
+
+  # --------------------------------------------------------------------------
+  # JOB 2 — Backend (NestJS)
+  # ESLint com type-aware rules + Jest com cobertura
+  # --------------------------------------------------------------------------
+  backend:
+    name: Backend — lint & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn workspace @supermarket/backend lint
+
+      - name: Test
+        run: yarn workspace @supermarket/backend test:ci
+        env:
+          # Variáveis mínimas para NestJS inicializar nos testes
+          NODE_ENV: test
+          PORT: 3001
+          JWT_SECRET: ci-test-secret
+          JWT_EXPIRES_IN: 1h
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_KEY: placeholder-service-key
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: apps/backend/coverage/
+          retention-days: 7
+
+  # --------------------------------------------------------------------------
+  # JOB 3 — Admin (React + Vite)
+  # ESLint com regras React + Vitest com cobertura
+  # --------------------------------------------------------------------------
+  admin:
+    name: Admin — lint & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn workspace @supermarket/admin lint
+
+      - name: Test
+        run: yarn workspace @supermarket/admin test:ci
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-coverage
+          path: apps/admin/coverage/
+          retention-days: 7
+
+  # --------------------------------------------------------------------------
+  # JOB 4 — Status gate
+  # Job final que só passa se todos os outros passaram.
+  # Configure como required check no GitHub Branch Protection.
+  # --------------------------------------------------------------------------
+  ci-ok:
+    name: CI passed
+    runs-on: ubuntu-latest
+    needs: [format, backend, admin]
+    if: always()
+
+    steps:
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.format.result }}" != "success" || \
+                "${{ needs.backend.result }}" != "success" || \
+                "${{ needs.admin.result }}" != "success" ]]; then
+            echo "One or more CI jobs failed."
+            exit 1
+          fi
+          echo "All CI jobs passed."

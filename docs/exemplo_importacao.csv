@@ -1,0 +1,6 @@
+nome,codigo_barras,preco,custo,ncm,categoria,estoque_inicial
+Refrigerante Cola 2L,7891234567890,8.99,4.50,22021000,Bebidas,100
+Arroz Branco 5kg,7890123456789,24.50,18.00,10063021,Mercearia,50
+Feijão Carioca 1kg,7891123456788,7.99,5.00,07133319,Mercearia,80
+Macarrão Espaguete 500g,7892123456787,4.50,2.20,19021900,Mercearia,120
+Leite Integral 1L,7893123456786,5.30,3.80,04012010,Laticínios,200

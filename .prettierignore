@@ -1,0 +1,21 @@
+# Build outputs
+dist/
+build/
+out/
+dist-electron/
+release/
+coverage/
+
+# Gerados automaticamente
+*.lock
+yarn.lock
+package-lock.json
+
+# Banco / Supabase
+supabase/.temp/
+supabase/.branches/
+
+# Electron
+apps/pdv/release/
+
+node_modules/

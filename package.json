@@ -1,0 +1,44 @@
+{
+  "name": "supermarket-system",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "yarn workspace @supermarket/backend dev",
+    "dev:admin":   "yarn workspace @supermarket/admin dev",
+    "dev:pdv":     "yarn workspace @supermarket/pdv dev",
+
+    "build:backend": "yarn workspace @supermarket/backend build",
+    "build:admin":   "yarn workspace @supermarket/admin build",
+    "build:pdv":     "yarn workspace @supermarket/pdv build",
+
+    "lint":       "yarn workspaces run lint",
+    "lint:check": "yarn workspaces run lint",
+
+    "format":       "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
+
+    "test":    "yarn workspaces run test",
+    "test:ci": "yarn workspace @supermarket/backend test:ci && yarn workspace @supermarket/admin test:ci"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=1.22.0"
+  }
+}
