@@ -37,13 +37,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Check formatting
-        run: yarn format:check
+        run: npm run format:check
 
   # --------------------------------------------------------------------------
   # JOB 2 — Backend (NestJS)
@@ -61,16 +61,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Lint
-        run: yarn workspace @supermarket/backend lint
+        run: npm run lint --workspace=@supermarket/backend
 
       - name: Test
-        run: yarn workspace @supermarket/backend test:ci
+        run: npm run test:ci --workspace=@supermarket/backend
         env:
           # Variáveis mínimas para NestJS inicializar nos testes
           NODE_ENV: test
@@ -105,16 +105,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Lint
-        run: yarn workspace @supermarket/admin lint
+        run: npm run lint --workspace=@supermarket/admin
 
       - name: Test
-        run: yarn workspace @supermarket/admin test:ci
+        run: npm run test:ci --workspace=@supermarket/admin
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
