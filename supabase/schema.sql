@@ -184,9 +184,10 @@ CREATE TABLE sale_items (
   id          UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
   sale_id     UUID          NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
   product_id  UUID          NOT NULL REFERENCES products(id),
-  barcode     TEXT          NOT NULL,  -- snapshot
-  name        TEXT          NOT NULL,  -- snapshot
-  qty         NUMERIC(10,3) NOT NULL CHECK (qty > 0),
+  barcode      TEXT          NOT NULL,  -- snapshot
+  name         TEXT          NOT NULL,  -- snapshot
+  ncm_snapshot CHAR(8)       NOT NULL DEFAULT '00000000', -- snapshot do NCM para NFC-e
+  qty          NUMERIC(10,3) NOT NULL CHECK (qty > 0),
   unit_price  NUMERIC(10,2) NOT NULL CHECK (unit_price >= 0),
   discount    NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (discount >= 0),
   total       NUMERIC(10,2) NOT NULL CHECK (total >= 0),
@@ -299,6 +300,57 @@ ALTER TABLE cashier_sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Usuário lê seu próprio perfil"
   ON users FOR SELECT
   USING (auth.uid() = id);
+
+-- =============================================================================
+-- TABELA: fiscal_documents
+-- =============================================================================
+CREATE TABLE fiscal_documents (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  sale_id        UUID        NOT NULL REFERENCES sales(id) ON DELETE CASCADE UNIQUE,
+  type           TEXT        NOT NULL DEFAULT 'nfce' CHECK (type IN ('nfce', 'nfe')),
+  status         TEXT        NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'authorized', 'cancelled', 'rejected')),
+  access_key     CHAR(44),
+  xml_url        TEXT,
+  protocol       TEXT,
+  error_message  TEXT,
+  issued_at      TIMESTAMPTZ,
+  cancelled_at   TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE fiscal_documents IS 'Documentos Fiscais via Focus NFe';
+
+ALTER TABLE fiscal_documents ENABLE ROW LEVEL SECURITY;
+
+CREATE TRIGGER trg_fiscal_documents_updated_at
+  BEFORE UPDATE ON fiscal_documents
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE POLICY "Autenticados podem ler documentos fiscais"
+  ON fiscal_documents FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+-- =============================================================================
+-- TABELA: certificate_config
+-- =============================================================================
+CREATE TABLE certificate_config (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  cnpj           TEXT        NOT NULL,
+  razao_social   TEXT        NOT NULL,
+  valid_until    TIMESTAMPTZ NOT NULL,
+  storage_path   TEXT        NOT NULL,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE certificate_config IS 'Registro central do Certificado Digital A1 ativo';
+
+ALTER TABLE certificate_config ENABLE ROW LEVEL SECURITY;
+
+CREATE TRIGGER trg_certificate_config_updated_at
+  BEFORE UPDATE ON certificate_config
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- =============================================================================
 -- FIM DO SCHEMA
