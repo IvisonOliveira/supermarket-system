@@ -36,7 +36,7 @@ export class SalesService {
     
     const { data: products, error: prodErr } = await this.supabase
       .from('products')
-      .select('id, name, barcode, price')
+      .select('id, name, barcode, price, ncm')
       .in('id', productIds);
 
     if (prodErr) throw new ConflictException(`Erro ao buscar produtos: ${prodErr.message}`);
@@ -55,6 +55,7 @@ export class SalesService {
         unit_price: item.unit_price,
         product_name_snapshot: product.name,
         product_barcode_snapshot: product.barcode,
+        ncm_snapshot: product.ncm || '00000000',
         subtotal
       };
     });
@@ -117,7 +118,7 @@ export class SalesService {
         const productIds = saleDto.items.map(i => i.product_id);
         const { data: products } = await this.supabase
           .from('products')
-          .select('id, name, barcode')
+          .select('id, name, barcode, ncm')
           .in('id', productIds);
 
         let total = 0;
@@ -131,6 +132,7 @@ export class SalesService {
              unit_price: item.unit_price,
              product_name_snapshot: product ? product.name : 'Produto Desconhecido',
              product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
+             ncm_snapshot: product && product.ncm ? product.ncm : '00000000',
              subtotal
            };
         });
