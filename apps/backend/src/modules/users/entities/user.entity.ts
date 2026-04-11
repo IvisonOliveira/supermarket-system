@@ -1,4 +1,4 @@
-import { UserRole } from '@supermarket/shared';
+import type { UserRole } from '@supermarket/shared';
 
 export class UserEntity {
   id: string;

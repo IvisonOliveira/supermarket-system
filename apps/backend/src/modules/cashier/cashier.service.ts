@@ -1,4 +1,5 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 import { SalesService } from '../sales/sales.service';
 
@@ -58,9 +59,9 @@ export class CashierService {
       throw new ConflictException('Este caixa já está fechado.');
     }
 
-    const sales = await this.salesService.findByPeriod(session.opened_at, undefined, sessionId);
-    
-    const validSales = sales.filter(s => s.status !== 'cancelled');
+    const sales = await this.salesService.findByPeriod(session.opened_at as string, undefined, sessionId);
+
+    const validSales = sales.filter((s) => s.status !== 'cancelled');
     const totalSales = validSales.reduce((acc, current) => acc + current.total, 0);
     const totalTransactions = validSales.length;
 
@@ -110,18 +111,21 @@ export class CashierService {
       throw new NotFoundException(`Sessão ${sessionId} não encontrada.`);
     }
 
-    const closedAt = session.closed_at || new Date().toISOString();
-    const sales = await this.salesService.findByPeriod(session.opened_at, closedAt, sessionId);
-    const validSales = sales.filter(s => s.status !== 'cancelled');
+    const closedAt = (session.closed_at as string) || new Date().toISOString();
+    const sales = await this.salesService.findByPeriod(session.opened_at as string, closedAt, sessionId);
+    const validSales = sales.filter((s) => s.status !== 'cancelled');
 
-    const paymentSummary = validSales.reduce((acc, sale) => {
-      const pm = sale.payment_method;
-      if (!acc[pm]) {
-        acc[pm] = 0;
-      }
-      acc[pm] += sale.total;
-      return acc;
-    }, {} as Record<string, number>);
+    const paymentSummary = validSales.reduce(
+      (acc, sale) => {
+        const pm = sale.payment_method;
+        if (!acc[pm]) {
+          acc[pm] = 0;
+        }
+        acc[pm] += sale.total;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       session,

@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { IsInt, IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class ProductFilterDto {
   @ApiPropertyOptional({ default: 1 })

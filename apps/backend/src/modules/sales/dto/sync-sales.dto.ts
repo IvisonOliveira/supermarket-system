@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, ValidateNested, IsString, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsArray, ValidateNested, IsString, IsUUID } from 'class-validator';
+
 import { CreateSaleDto } from './create-sale.dto';
 
 export class SyncSaleEntryDto extends CreateSaleDto {

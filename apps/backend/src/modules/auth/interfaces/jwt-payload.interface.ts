@@ -1,4 +1,4 @@
-import { UserRole } from '@supermarket/shared';
+import type { UserRole } from '@supermarket/shared';
 
 export interface JwtPayload {
   sub: string;

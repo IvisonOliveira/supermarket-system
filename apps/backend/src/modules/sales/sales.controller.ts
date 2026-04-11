@@ -13,13 +13,14 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 
+import { CurrentUser, RequestUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { CurrentUser, RequestUser } from '../../common/decorators/current-user.decorator';
-import { SalesService } from './sales.service';
+
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { SyncSalesDto } from './dto/sync-sales.dto';
+import { SalesService } from './sales.service';
 
 @ApiTags('sales')
 @ApiBearerAuth()
@@ -31,10 +32,7 @@ export class SalesController {
   @Post()
   @ApiOperation({ summary: 'Registrar nova venda' })
   @ApiResponse({ status: 201 })
-  create(
-    @Body() dto: CreateSaleDto,
-    @CurrentUser() user: RequestUser,
-  ) {
+  create(@Body() dto: CreateSaleDto, @CurrentUser() user: RequestUser) {
     return this.salesService.create(dto, user.id);
   }
 
@@ -72,10 +70,7 @@ export class SalesController {
   @Roles('ADMIN', 'GERENTE')
   @ApiOperation({ summary: 'Cancelar venda (até 30 min após emissão)' })
   @ApiResponse({ status: 200 })
-  cancel(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: RequestUser,
-  ) {
+  cancel(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: RequestUser) {
     return this.salesService.cancel(id, user.id);
   }
 }

@@ -1,5 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -8,9 +15,7 @@ export class UsersService {
   constructor(private readonly supabase: SupabaseConfig) {}
 
   async findAll() {
-    const { data, error } = await this.supabase.serviceClient
-      .from('users')
-      .select('*');
+    const { data, error } = await this.supabase.serviceClient.from('users').select('*');
 
     if (error) {
       throw new InternalServerErrorException(error.message);

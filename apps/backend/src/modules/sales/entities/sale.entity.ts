@@ -1,4 +1,4 @@
-import { SaleStatus, PaymentMethod } from '@supermarket/shared';
+import type { SaleStatus, PaymentMethod } from '@supermarket/shared';
 
 export class SaleItemEntity {
   productId: string;

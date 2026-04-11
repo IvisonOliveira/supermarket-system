@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 import { UserRole } from '@supermarket/shared';
 
 export class UserResponseDto {

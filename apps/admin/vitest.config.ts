@@ -6,19 +6,14 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    globals: true,           // describe/it/expect disponíveis sem import
+    globals: true, // describe/it/expect disponíveis sem import
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
       reportsDirectory: './coverage',
-      exclude: [
-        'src/main.tsx',
-        'src/test/**',
-        '**/*.d.ts',
-        '**/index.ts',
-      ],
+      exclude: ['src/main.tsx', 'src/test/**', '**/*.d.ts', '**/index.ts'],
     },
   },
   resolve: {

@@ -10,13 +10,14 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 
+import { CurrentUser, RequestUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { CurrentUser, RequestUser } from '../../common/decorators/current-user.decorator';
-import { StockService } from './stock.service';
+
 import { CreateMovementDto } from './dto/create-movement.dto';
 import { MovementResponseDto } from './dto/movement-response.dto';
+import { StockService } from './stock.service';
 
 @ApiTags('stock')
 @ApiBearerAuth()

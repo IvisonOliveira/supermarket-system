@@ -7,7 +7,7 @@ import {
   getProductByBarcode,
   insertSale,
   getPendingSales,
-  markSaleSynced
+  markSaleSynced,
 } from './database';
 import { initBarcodeDetector } from './barcode-detector';
 import { scaleReader } from './scale-reader';

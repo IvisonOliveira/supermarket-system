@@ -1,6 +1,5 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 
-import { StockMovementType } from '@supermarket/shared';
 import { CreateMovementDto } from './dto/create-movement.dto';
 import { MovementResponseDto } from './dto/movement-response.dto';
 
@@ -11,7 +10,7 @@ interface FindMovementsOptions {
 
 @Injectable()
 export class StockService {
-  async createMovement(dto: CreateMovementDto, operatorId: string): Promise<MovementResponseDto> {
+  createMovement(dto: CreateMovementDto, operatorId: string): Promise<MovementResponseDto> {
     // TODO: buscar qty atual, calcular qtyAfter, inserir movimentação no Supabase,
     //       atualizar stock_qty no produto
     void dto;
@@ -23,7 +22,7 @@ export class StockService {
    * Chamado internamente pelo SalesService após cada venda confirmada.
    * Gera movimentação do tipo 'venda' para cada item.
    */
-  async registerSaleMovements(
+  registerSaleMovements(
     saleId: string,
     items: Array<{ productId: string; qty: number }>,
     operatorId: string,
@@ -32,21 +31,22 @@ export class StockService {
     void saleId;
     void items;
     void operatorId;
+    return Promise.resolve();
   }
 
-  async findMovements(_options: FindMovementsOptions): Promise<MovementResponseDto[]> {
+  findMovements(_options: FindMovementsOptions): Promise<MovementResponseDto[]> {
     // TODO: listar do Supabase com filtros
-    return [];
+    return Promise.resolve([]);
   }
 
-  async findLowStock(): Promise<unknown[]> {
+  findLowStock(): Promise<unknown[]> {
     // TODO: SELECT products WHERE stock_qty <= stock_min
-    return [];
+    return Promise.resolve([]);
   }
 
-  async getPosition(productId: string): Promise<{ productId: string; stockQty: number }> {
+  getPosition(productId: string): Promise<{ productId: string; stockQty: number }> {
     // TODO: buscar stock_qty atual do produto no Supabase
     void productId;
-    return { productId, stockQty: 0 };
+    return Promise.resolve({ productId, stockQty: 0 });
   }
 }

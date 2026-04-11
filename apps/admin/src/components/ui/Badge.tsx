@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export interface BadgeProps {
   variant?: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
@@ -16,7 +16,9 @@ export function Badge({ variant = 'neutral', children, className = '' }: BadgePr
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${variants[variant]} ${className}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${variants[variant]} ${className}`}
+    >
       {children}
     </span>
   );

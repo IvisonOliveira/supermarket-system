@@ -19,9 +19,9 @@ Sistema completo de gestão para supermercados com PDV offline-first, painel adm
 ## Requisitos
 
 | Ferramenta | Versão mínima |
-|-----------|--------------|
-| Node.js   | 20.x         |
-| Yarn      | 1.22.x       |
+| ---------- | ------------- |
+| Node.js    | 20.x          |
+| Yarn       | 1.22.x        |
 
 ## Primeiros Passos
 
@@ -53,13 +53,13 @@ yarn dev:pdv
 
 ## Scripts disponíveis na raiz
 
-| Comando            | Descrição                         |
-|-------------------|-----------------------------------|
-| `yarn dev:backend` | Inicia o backend em modo watch    |
-| `yarn dev:admin`   | Inicia o admin em modo dev        |
-| `yarn dev:pdv`     | Inicia o PDV (Electron + Vite)    |
-| `yarn build:*`     | Build de produção de cada app     |
-| `yarn lint`        | Lint em todos os workspaces       |
+| Comando            | Descrição                              |
+| ------------------ | -------------------------------------- |
+| `yarn dev:backend` | Inicia o backend em modo watch         |
+| `yarn dev:admin`   | Inicia o admin em modo dev             |
+| `yarn dev:pdv`     | Inicia o PDV (Electron + Vite)         |
+| `yarn build:*`     | Build de produção de cada app          |
+| `yarn lint`        | Lint em todos os workspaces            |
 | `yarn format`      | Formata todos os arquivos com Prettier |
 
 ## Stack Tecnológica
@@ -73,11 +73,11 @@ yarn dev:pdv
 
 ## Perfis de Acesso
 
-| Perfil     | Permissões                                       |
-|-----------|--------------------------------------------------|
-| `ADMIN`    | Acesso total                                    |
-| `GERENTE`  | Gestão operacional, sem configurações críticas  |
-| `OPERADOR` | Somente PDV e consultas                         |
+| Perfil     | Permissões                                     |
+| ---------- | ---------------------------------------------- |
+| `ADMIN`    | Acesso total                                   |
+| `GERENTE`  | Gestão operacional, sem configurações críticas |
+| `OPERADOR` | Somente PDV e consultas                        |
 
 ## Convenções
 

@@ -35,8 +35,8 @@ module.exports = {
     '@typescript-eslint/await-thenable': 'error',
 
     // --- NestJS patterns ---
-    '@typescript-eslint/explicit-function-return-type': 'off',     // muito verboso com NestJS
-    '@typescript-eslint/explicit-module-boundary-types': 'off',    // inferido pelo framework
+    '@typescript-eslint/explicit-function-return-type': 'off', // muito verboso com NestJS
+    '@typescript-eslint/explicit-module-boundary-types': 'off', // inferido pelo framework
     '@typescript-eslint/no-explicit-any': 'warn',
 
     // Permite `void dto;` como marker de "não implementado ainda" nos services

@@ -9,24 +9,24 @@
 
 export const IPC = {
   // Banco de dados local (SQLite)
-  DB_GET_PRODUCTS:     'db:getProducts',
-  DB_SEARCH_PRODUCTS:  'db:searchProducts',
+  DB_GET_PRODUCTS: 'db:getProducts',
+  DB_SEARCH_PRODUCTS: 'db:searchProducts',
   DB_GET_PRODUCT_BY_BARCODE: 'db:getProductByBarcode',
-  DB_CREATE_SALE:      'db:createSale',
-  DB_GET_PENDING_SALES:'db:getPendingSales',
+  DB_CREATE_SALE: 'db:createSale',
+  DB_GET_PENDING_SALES: 'db:getPendingSales',
   DB_MARK_SALE_SYNCED: 'db:markSaleSynced',
 
   // Hardware
-  SCALE_LIST_PORTS:    'scale:listPorts',
-  SCALE_CONNECT:       'scale:connect',
-  SCALE_DISCONNECT:    'scale:disconnect',
+  SCALE_LIST_PORTS: 'scale:listPorts',
+  SCALE_CONNECT: 'scale:connect',
+  SCALE_DISCONNECT: 'scale:disconnect',
   SCALE_WEIGHT_UPDATE: 'scale:weightUpdate',
   PRINTER_PRINT_RECEIPT: 'printer:printReceipt',
-  BARCODE_SCANNED:     'barcode:scanned',
+  BARCODE_SCANNED: 'barcode:scanned',
 
   // Sincronização com o backend
-  SYNC_TRIGGER:        'sync:trigger',
-  SYNC_STATUS:         'sync:status', // canal de evento (main → renderer)
+  SYNC_TRIGGER: 'sync:trigger',
+  SYNC_STATUS: 'sync:status', // canal de evento (main → renderer)
 } as const;
 
 // ── Tipos de dados ──────────────────────────────────────────────────────────
@@ -47,13 +47,13 @@ export interface SaleItem {
 }
 
 export interface SaleData {
-  id: string;          // UUID gerado no cliente
+  id: string; // UUID gerado no cliente
   cashier_id: string;
   operator_id: string;
   items: SaleItem[];
   total: number;
   payment_method: 'cash' | 'card' | 'pix';
-  created_at: string;  // ISO 8601
+  created_at: string; // ISO 8601
 }
 
 export interface ReceiptData {

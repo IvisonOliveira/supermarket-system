@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 
 @Injectable()
@@ -23,7 +24,10 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    const { data: { user }, error } = await this.supabase.client.auth.getUser(token);
+    const {
+      data: { user },
+      error,
+    } = await this.supabase.client.auth.getUser(token);
 
     if (error || !user) {
       throw new UnauthorizedException('Token inválido ou expirado');
@@ -35,9 +39,11 @@ export class AuthService {
   async signOut(token: string) {
     const client = this.supabase.forUser(token);
     const { error } = await client.auth.signOut();
-    
+
     if (error) {
-      throw new UnauthorizedException('Sua sessão já estava inválida ou ocorreu uma falha ao realizar o logoff.');
+      throw new UnauthorizedException(
+        'Sua sessão já estava inválida ou ocorreu uma falha ao realizar o logoff.',
+      );
     }
   }
 }
