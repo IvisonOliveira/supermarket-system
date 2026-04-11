@@ -1,7 +1,14 @@
-import { Injectable, Logger, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 import { SalesService } from '../sales/sales.service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FiscalService {
@@ -14,7 +21,8 @@ export class FiscalService {
     private readonly salesService: SalesService,
     private readonly configService: ConfigService,
   ) {
-    this.focusApiUrl = this.configService.get<string>('FOCUS_NFE_API_URL') || 'https://api.focusnfe.com.br/v2';
+    this.focusApiUrl =
+      this.configService.get<string>('FOCUS_NFE_API_URL') || 'https://api.focusnfe.com.br/v2';
     this.focusApiToken = this.configService.get<string>('FOCUS_NFE_API_TOKEN') || 'TOKEN_MOCK';
   }
 
@@ -35,7 +43,9 @@ export class FiscalService {
       .single();
 
     if (existingDoc && existingDoc.status !== 'rejected') {
-      throw new ConflictException(`Documento fiscal associado a esta venda já possui o status: ${existingDoc.status}`);
+      throw new ConflictException(
+        `Documento fiscal associado a esta venda já possui o status: ${existingDoc.status}`,
+      );
     }
 
     // 1. Montagem do payload fiscal
@@ -46,30 +56,30 @@ export class FiscalService {
         codigo_produto: item.product_id,
         descricao: item.product_name_snapshot,
         ncm: item.ncm_snapshot,
-        cfop: "5102",  // TODO: REVISAR CFOP (Venda mercado interno consumidor)
+        cfop: '5102', // TODO: REVISAR CFOP (Venda mercado interno consumidor)
         valor_unitario_comercial: item.unit_price,
         quantidade_comercial: item.qty,
         valor_bruto: item.total, // Total após possíveis descontos/rateios
-        unidade_comercial: "UN", // TODO: recuperar do snapshot no futuro
-        icms_origem: "0",        // TODO: Mapear via Config ou Produto
-        icms_situacao_tributaria: "102", // TODO: REVISAR Simples Nacional
+        unidade_comercial: 'UN', // TODO: recuperar do snapshot no futuro
+        icms_origem: '0', // TODO: Mapear via Config ou Produto
+        icms_situacao_tributaria: '102', // TODO: REVISAR Simples Nacional
       };
     });
 
     const payload = {
-      natureza_operacao: "Venda Presencial ao Consumidor",
+      natureza_operacao: 'Venda Presencial ao Consumidor',
       data_emissao: new Date().toISOString(),
-      presenca_comprador: "1", // Operação presencial
-      cnpj_emitente: "00000000000000", // TODO: REVISAR Extrair da ENV ou base
-      modalidade_frete: "9", // Sem frete
-      local_destino: "1", // Operação interna (mesmo estado)
+      presenca_comprador: '1', // Operação presencial
+      cnpj_emitente: '00000000000000', // TODO: REVISAR Extrair da ENV ou base
+      modalidade_frete: '9', // Sem frete
+      local_destino: '1', // Operação interna (mesmo estado)
       itens: items,
       formas_pagamento: [
         {
-           forma_pagamento: "01", // TODO: Mapear Dinheiro/Cartão de sale.payment_method
-           valor_pagamento: sale.total
-        }
-      ]
+          forma_pagamento: '01', // TODO: Mapear Dinheiro/Cartão de sale.payment_method
+          valor_pagamento: sale.total,
+        },
+      ],
     };
 
     // 2. Transmissão à Focus API
@@ -82,9 +92,9 @@ export class FiscalService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${base64Auth}`
+          Authorization: `Basic ${base64Auth}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       responseData = await response.json();
       isSuccess = response.ok;
@@ -93,17 +103,25 @@ export class FiscalService {
     }
 
     // 3. Status handling
-    const status = isSuccess && responseData.status === 'autorizado' ? 'authorized' : (isSuccess ? 'pending' : 'rejected');
-    
+    const status =
+      isSuccess && responseData.status === 'autorizado'
+        ? 'authorized'
+        : isSuccess
+          ? 'pending'
+          : 'rejected';
+
     if (existingDoc) {
-      await this.supabase.from('fiscal_documents').update({
-        status,
-        access_key: responseData.chave_nfe || null,
-        protocol: responseData.protocolo || null,
-        xml_url: responseData.caminho_xml_nota_fiscal || null,
-        error_message: !isSuccess ? JSON.stringify(responseData) : null,
-        issued_at: isSuccess ? new Date().toISOString() : null
-      }).eq('id', existingDoc.id);
+      await this.supabase
+        .from('fiscal_documents')
+        .update({
+          status,
+          access_key: responseData.chave_nfe || null,
+          protocol: responseData.protocolo || null,
+          xml_url: responseData.caminho_xml_nota_fiscal || null,
+          error_message: !isSuccess ? JSON.stringify(responseData) : null,
+          issued_at: isSuccess ? new Date().toISOString() : null,
+        })
+        .eq('id', existingDoc.id);
     } else {
       await this.supabase.from('fiscal_documents').insert({
         sale_id: saleId,
@@ -113,7 +131,7 @@ export class FiscalService {
         protocol: responseData.protocolo || null,
         xml_url: responseData.caminho_xml_nota_fiscal || null,
         error_message: !isSuccess ? JSON.stringify(responseData) : null,
-        issued_at: isSuccess ? new Date().toISOString() : null
+        issued_at: isSuccess ? new Date().toISOString() : null,
       });
     }
 
@@ -132,13 +150,13 @@ export class FiscalService {
       const response = await fetch(`${this.focusApiUrl}/nfce/${accessKey}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Basic ${base64Auth}`
-        }
+          Authorization: `Basic ${base64Auth}`,
+        },
       });
       const data: any = await response.json();
-      
+
       if (response.ok && data?.status) {
-         return { status: data.status, details: data };
+        return { status: data.status, details: data };
       }
       throw new BadRequestException('Consulta não retornou dados válidos');
     } catch (err: any) {
@@ -156,10 +174,12 @@ export class FiscalService {
     if (!doc) throw new NotFoundException('Documento fiscal não encontrado com a chave fornecida');
 
     if (doc.issued_at) {
-       const elapsed = Date.now() - new Date(doc.issued_at).getTime();
-       if (elapsed > 30 * 60 * 1000) {
-          throw new BadRequestException('Cancelamento permitido apenas até 30 minutos após a emissão');
-       }
+      const elapsed = Date.now() - new Date(doc.issued_at as string).getTime();
+      if (elapsed > 30 * 60 * 1000) {
+        throw new BadRequestException(
+          'Cancelamento permitido apenas até 30 minutos após a emissão',
+        );
+      }
     }
 
     let isSuccess = false;
@@ -171,9 +191,9 @@ export class FiscalService {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${base64Auth}`
+          Authorization: `Basic ${base64Auth}`,
         },
-        body: JSON.stringify({ justificativa })
+        body: JSON.stringify({ justificativa }),
       });
       responseData = await response.json();
       isSuccess = response.ok;
@@ -182,23 +202,29 @@ export class FiscalService {
     }
 
     if (!isSuccess) {
-       throw new BadRequestException(`Falha da API ao cancelar: ${JSON.stringify(responseData)}`);
+      throw new BadRequestException(`Falha da API ao cancelar: ${JSON.stringify(responseData)}`);
     }
 
-    await this.supabase.from('fiscal_documents').update({
-       status: 'cancelled',
-       cancelled_at: new Date().toISOString()
-    }).eq('id', doc.id);
+    await this.supabase
+      .from('fiscal_documents')
+      .update({
+        status: 'cancelled',
+        cancelled_at: new Date().toISOString(),
+      })
+      .eq('id', doc.id);
 
     return { status: 'cancelled', message: 'NFC-e cancelada com sucesso' };
   }
 
   async findAll(from?: string, to?: string, status?: string) {
-    let query = this.supabase.from('fiscal_documents').select('*, sale:sales(total, created_at, cashier_id)').order('created_at', { ascending: false });
+    let query = this.supabase
+      .from('fiscal_documents')
+      .select('*, sale:sales(total, created_at, cashier_id)')
+      .order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     if (from) query = query.gte('created_at', from);
     if (to) query = query.lte('created_at', to);
-    
+
     const { data, error } = await query;
     if (error) throw new ConflictException(`Erro ao listar documentos fiscais: ${error.message}`);
     return data || [];

@@ -52,7 +52,7 @@ export class SalesService {
         product_name_snapshot: product.name,
         product_barcode_snapshot: product.barcode,
         ncm_snapshot: product.ncm || '00000000',
-        subtotal
+        subtotal,
       };
     });
 
@@ -118,19 +118,19 @@ export class SalesService {
           .in('id', productIds);
 
         let total = 0;
-        const saleItemsData = saleDto.items.map(item => {
-           const product = products?.find(p => p.id === item.product_id);
-           const subtotal = item.qty * item.unit_price;
-           total += subtotal;
-           return {
-             product_id: item.product_id,
-             quantity: item.qty,
-             unit_price: item.unit_price,
-             product_name_snapshot: product ? product.name : 'Produto Desconhecido',
-             product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
-             ncm_snapshot: product && product.ncm ? product.ncm : '00000000',
-             subtotal
-           };
+        const saleItemsData = saleDto.items.map((item) => {
+          const product = products?.find((p) => p.id === item.product_id);
+          const subtotal = item.qty * item.unit_price;
+          total += subtotal;
+          return {
+            product_id: item.product_id,
+            quantity: item.qty,
+            unit_price: item.unit_price,
+            product_name_snapshot: product ? product.name : 'Produto Desconhecido',
+            product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
+            ncm_snapshot: product && product.ncm ? product.ncm : '00000000',
+            subtotal,
+          };
         });
 
         const finalTotal = Math.max(0, total - saleDto.discount);
