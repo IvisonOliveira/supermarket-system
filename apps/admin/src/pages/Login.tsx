@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { Input, Button } from '../components/ui';
-import api from '../services/api';
+import { api } from '../services/api';
 import { useAuthStore } from '../store/useAppStore';
 
 const loginSchema = z.object({
@@ -37,6 +38,7 @@ export default function Login() {
 
       login(user, token);
       navigate('/');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || 'Falha ao autenticar. Verifique suas credenciais.';
