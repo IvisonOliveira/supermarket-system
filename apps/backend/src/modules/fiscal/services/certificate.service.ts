@@ -1,8 +1,16 @@
-import { Injectable, Logger, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
-import { SupabaseConfig } from '../../../config/supabase.config';
+import * as crypto from 'crypto';
+
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as forge from 'node-forge';
-import * as crypto from 'crypto';
+
+import { SupabaseConfig } from '../../../config/supabase.config';
 
 @Injectable()
 export class CertificateService {
@@ -14,7 +22,9 @@ export class CertificateService {
     private readonly configService: ConfigService,
   ) {
     // Fallback de desenvolvimento. Deve ser preenchido no .env
-    const rawKey = this.configService.get<string>('CERTIFICATE_ENCRYPTION_KEY') || 'default-supermarket-secret-32b!';
+    const rawKey =
+      this.configService.get<string>('CERTIFICATE_ENCRYPTION_KEY') ||
+      'default-supermarket-secret-32b!';
     // Garante que tenha 32 bytes validos para AES-256 usando SHA-256
     this.encryptionKey = crypto.createHash('sha256').update(rawKey).digest();
   }
@@ -42,7 +52,7 @@ export class CertificateService {
       // 1. Extração de Metadados via node-forge (PKCS#12)
       const p12Der = forge.util.createBuffer(fileBuf.toString('binary'));
       const p12Asn1 = forge.asn1.fromDer(p12Der);
-      
+
       // Essa linha explodirá exception se a senha estiver errada:
       const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
 
@@ -58,7 +68,9 @@ export class CertificateService {
       }
 
       if (!certBag) {
-        throw new BadRequestException('Certificado (CertBag) não encontrado dentro do arquivo PFX.');
+        throw new BadRequestException(
+          'Certificado (CertBag) não encontrado dentro do arquivo PFX.',
+        );
       }
 
       const cert = certBag.cert as forge.pki.Certificate;
@@ -69,14 +81,14 @@ export class CertificateService {
       cert.subject.attributes.forEach((attr: any) => {
         if (attr.shortName === 'CN') razaoSocial = attr.value;
       });
-      
+
       // Procura regex bruta do formato de CNPJ contido em atributos do certificado A1
       const subjectStr = cert.subject.attributes.map((a: any) => a.value).join(' ');
       const cnpjMatch = subjectStr.match(/\d{14}/);
       if (cnpjMatch) {
-         cnpj = cnpjMatch[0];
+        cnpj = cnpjMatch[0];
       } else {
-         cnpj = 'Desconhecido';
+        cnpj = 'Desconhecido';
       }
 
       // 2. Proteção AES-256 antes da cloud
@@ -88,43 +100,45 @@ export class CertificateService {
         .from('certificates')
         .upload(fileName, encryptedFile, {
           contentType: 'application/octet-stream',
-          upsert: true
+          upsert: true,
         });
 
       if (storageErr) throw new Error(`Falha no bucket: ${storageErr.message}`);
 
       // 4. Grava Metadados - Remove docs legados
-      await this.supabase.from('certificate_config').delete().neq('id', '00000000-0000-0000-0000-000000000000'); 
+      await this.supabase
+        .from('certificate_config')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       const { error: dbErr } = await this.supabase.from('certificate_config').insert({
-         cnpj,
-         razao_social: razaoSocial,
-         valid_until: validUntil.toISOString(),
-         storage_path: storageData.path,
+        cnpj,
+        razao_social: razaoSocial,
+        valid_until: validUntil.toISOString(),
+        storage_path: storageData.path,
       });
 
       if (dbErr) throw new Error(`Falha na base de dados ao registrar cert: ${dbErr.message}`);
 
-      this.logger.log(`[CERTIFICADO] Novo certificado criptografado e salvo, expira em: ${validUntil.toISOString()}`);
+      this.logger.log(
+        `[CERTIFICADO] Novo certificado criptografado e salvo, expira em: ${validUntil.toISOString()}`,
+      );
       return { cnpj, razaoSocial, validUntil };
-
     } catch (err: any) {
       if (err.message && err.message.includes('MAC MAC')) {
-         throw new BadRequestException('Senha do certificado incorreta ou arquivo violado.');
+        throw new BadRequestException('Senha do certificado incorreta ou arquivo violado.');
       }
       throw new BadRequestException(`Erro processando certificado: ${err.message}`);
     }
   }
 
   async getStatus() {
-    const { data } = await this.supabase
-      .from('certificate_config')
-      .select('*');
+    const { data } = await this.supabase.from('certificate_config').select('*');
 
     if (!data || data.length === 0) return null;
-    
+
     const certConfig = data[0];
-    const validUntilDate = new Date(certConfig.valid_until);
+    const validUntilDate = new Date(certConfig.valid_until as string);
     const diffTime = validUntilDate.getTime() - new Date().getTime();
     const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -133,21 +147,18 @@ export class CertificateService {
       razaoSocial: certConfig.razao_social,
       validoAte: certConfig.valid_until,
       diasRestantes,
-      ativo: diasRestantes > 0
+      ativo: diasRestantes > 0,
     };
   }
 
   async getCertificate() {
-    const { data } = await this.supabase
-      .from('certificate_config')
-      .select('storage_path')
-      .single();
+    const { data } = await this.supabase.from('certificate_config').select('storage_path').single();
 
     if (!data) throw new NotFoundException('Nenhum certificado configurado na base.');
 
     const { data: fileData, error } = await this.supabase.storage
       .from('certificates')
-      .download(data.storage_path);
+      .download(data.storage_path as string);
 
     if (error || !fileData) {
       throw new ConflictException('Erro ao resgatar arquivo encriptado do storage.');

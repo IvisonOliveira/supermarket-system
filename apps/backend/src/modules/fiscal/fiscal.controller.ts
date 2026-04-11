@@ -1,17 +1,31 @@
-import { Controller, Post, Get, Delete, Param, Body, UseGuards, Query, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FiscalService } from './fiscal.service';
-import { CertificateService } from './services/certificate.service';
+
+import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+
+import { FiscalService } from './fiscal.service';
+import { CertificateService } from './services/certificate.service';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('fiscal')
 export class FiscalController {
   constructor(
-     private readonly fiscalService: FiscalService,
-     private readonly certificateService: CertificateService
+    private readonly fiscalService: FiscalService,
+    private readonly certificateService: CertificateService,
   ) {}
 
   @Post('nfce/:saleId')
@@ -30,7 +44,7 @@ export class FiscalController {
   @Roles('ADMIN', 'GERENTE')
   async cancelarNFCe(
     @Param('accessKey') accessKey: string,
-    @Body('justificativa') justificativa: string
+    @Body('justificativa') justificativa: string,
   ) {
     return this.fiscalService.cancelarNFCe(accessKey, justificativa);
   }
@@ -50,11 +64,12 @@ export class FiscalController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadCertificate(
     @UploadedFile() file: Express.Multer.File,
-    @Body('password') password?: string
+    @Body('password') password?: string,
   ) {
     if (!file || !password) throw new BadRequestException('Arquivo .pfx e senha são obrigatórios');
-    if (!file.originalname.toLowerCase().endsWith('.pfx')) throw new BadRequestException('Formato de certificado deve ser apenas .pfx');
-    return this.certificateService.upload(file.buffer, password);
+    if (!file.originalname.toLowerCase().endsWith('.pfx'))
+      throw new BadRequestException('Formato de certificado deve ser apenas .pfx');
+    return this.certificateService.upload(file.buffer as Buffer, password);
   }
 
   @Get('certificate/status')

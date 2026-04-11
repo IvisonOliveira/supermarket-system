@@ -59,7 +59,11 @@ export class CashierService {
       throw new ConflictException('Este caixa já está fechado.');
     }
 
-    const sales = await this.salesService.findByPeriod(session.opened_at as string, undefined, sessionId);
+    const sales = await this.salesService.findByPeriod(
+      session.opened_at as string,
+      undefined,
+      sessionId,
+    );
 
     const validSales = sales.filter((s) => s.status !== 'cancelled');
     const totalSales = validSales.reduce((acc, current) => acc + current.total, 0);
@@ -112,7 +116,11 @@ export class CashierService {
     }
 
     const closedAt = (session.closed_at as string) || new Date().toISOString();
-    const sales = await this.salesService.findByPeriod(session.opened_at as string, closedAt, sessionId);
+    const sales = await this.salesService.findByPeriod(
+      session.opened_at as string,
+      closedAt,
+      sessionId,
+    );
     const validSales = sales.filter((s) => s.status !== 'cancelled');
 
     const paymentSummary = validSales.reduce(
