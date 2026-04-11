@@ -97,7 +97,7 @@ export class ProductsService {
     }
 
     if (data.ncm) {
-      const taxes = await this.ibptService.getAliquotas(data.ncm);
+      const taxes = await this.ibptService.getAliquotas(data.ncm as string);
       if (taxes) {
         data.ibpt = taxes;
       }

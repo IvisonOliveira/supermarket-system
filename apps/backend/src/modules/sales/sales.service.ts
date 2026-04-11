@@ -226,9 +226,9 @@ export class SalesService {
     // Reverte o estoque passando quantidades negativas para descontar da baixa
     await this.stockService.registerSaleMovements(
       sale.id as string,
-      sale.items.map((i: any) => ({
-        productId: i.product_id as string,
-        qty: -i.quantity as number,
+      (sale.items as Array<{ product_id: string; quantity: number }>).map((i) => ({
+        productId: i.product_id,
+        qty: -i.quantity,
       })),
       operatorId,
     );

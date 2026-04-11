@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: any) {
+  validate(payload: any) {
     // Retorna explicitamente o payload desestruturado
     return {
       sub: payload.sub,
