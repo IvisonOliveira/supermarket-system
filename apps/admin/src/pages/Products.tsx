@@ -61,6 +61,7 @@ export default function Products() {
   const loadProducts = async () => {
     try {
       setLoading(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const params: any = {
         page: filters.page,
         limit: filters.limit,
@@ -89,6 +90,7 @@ export default function Products() {
 
   useEffect(() => {
     loadProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
