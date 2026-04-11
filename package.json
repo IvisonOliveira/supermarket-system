@@ -7,18 +7,18 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:backend": "yarn workspace @supermarket/backend dev",
-    "dev:admin": "yarn workspace @supermarket/admin dev",
-    "dev:pdv": "yarn workspace @supermarket/pdv dev",
-    "build:backend": "yarn workspace @supermarket/backend build",
-    "build:admin": "yarn workspace @supermarket/admin build",
-    "build:pdv": "yarn workspace @supermarket/pdv build",
-    "lint": "yarn workspaces run lint",
-    "lint:check": "yarn workspaces run lint",
+    "dev:backend": "npm run dev -w @supermarket/backend",
+    "dev:admin": "npm run dev -w @supermarket/admin",
+    "dev:pdv": "npm run dev -w @supermarket/pdv",
+    "build:backend": "npm run build -w @supermarket/backend",
+    "build:admin": "npm run build -w @supermarket/admin",
+    "build:pdv": "npm run build -w @supermarket/pdv",
+    "lint": "npm run lint --workspaces",
+    "lint:check": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
-    "test": "yarn workspaces run test",
-    "test:ci": "yarn workspace @supermarket/backend test:ci && yarn workspace @supermarket/admin test:ci"
+    "test": "npm run test --workspaces",
+    "test:ci": "npm run test:ci -w @supermarket/backend && npm run test:ci -w @supermarket/admin"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",

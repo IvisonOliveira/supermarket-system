@@ -1,30 +1,251 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts';
 
 import { api } from '../services/api';
 import { useAuthStore, useUIStore } from '../store/useAppStore';
+import { Card } from '../components/ui/Card';
+import { Spinner } from '../components/ui/Spinner';
+import { Badge } from '../components/ui/Badge';
+
+interface DailyReport {
+  todaySales: number;
+  averageTicket: number;
+  totalOrders: number;
+}
+
+interface SalesData {
+  date: string;
+  value: number;
+}
+
+interface TopProduct {
+  name: string;
+  sales: number;
+}
 
 export default function Dashboard() {
   const { isMenuOpen, toggleMenu } = useUIStore();
   const { user, logout } = useAuthStore();
-  const [data, setData] = useState<string>('Carregando...');
 
-  useEffect(() => {
-    // Exemplo de chamada HTTP usando a configuração local do Axios
-    const fetchData = async () => {
-      try {
-        const response = await api.get('/health');
-        setData(`Dados da API: ${response.data?.status || 'OK'}`);
-      } catch (error) {
-        setData('Backend não conectado — aguardando configuração');
-        console.error(error);
-      }
-    };
+  const [period, setPeriod] = useState('HOJE');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
-    fetchData();
+  const [dailyReport, setDailyReport] = useState<DailyReport | null>(null);
+  const [salesData, setSalesData] = useState<SalesData[]>([]);
+  const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
+  const [lowStockCount, setLowStockCount] = useState<number | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const [resDaily, resSales, resTop, resStock] = await Promise.all([
+        api.get('/reports/daily'),
+        api.get('/reports/sales'),
+        api.get('/reports/top-products'),
+        api.get('/stock/low'),
+      ]);
+
+      setDailyReport({
+        todaySales: resDaily.data?.todaySales ?? resDaily.data?.total ?? 0,
+        averageTicket: resDaily.data?.averageTicket ?? resDaily.data?.ticket ?? 0,
+        totalOrders: resDaily.data?.totalOrders ?? resDaily.data?.count ?? 0,
+      });
+      
+      const salesItems = resSales.data?.items ?? resSales.data;
+      setSalesData(Array.isArray(salesItems) ? salesItems : []);
+      
+      const topItems = resTop.data?.items ?? resTop.data;
+      setTopProducts(Array.isArray(topItems) ? topItems : []);
+      
+      const stockData = resStock.data?.items ?? resStock.data ?? [];
+      setLowStockCount(Array.isArray(stockData) ? stockData.length : (stockData?.count || 0));
+
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 60000); // Polling a cada 60s
+    return () => clearInterval(interval);
+  }, [fetchData]);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  };
+
+  const renderContent = () => {
+    if (loading && !dailyReport) { 
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <Spinner size="lg" />
+          <p className="mt-4 text-gray-500">Carregando dados do dashboard...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Dados indisponíveis</p>
+          <button 
+            onClick={fetchData}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {/* Topo: seletor de período */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-4">
+             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Resumo de Atividade</h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+             <select 
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+             >
+                <option value="HOJE">Hoje</option>
+                <option value="SEMANA">Esta Semana</option>
+                <option value="MES">Este Mês</option>
+                <option value="PERSONALIZADO">Personalizado</option>
+             </select>
+
+             {period === 'PERSONALIZADO' && (
+                <div className="flex items-center gap-2">
+                   <input 
+                      type="date" 
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   />
+                   <span className="text-gray-500">até</span>
+                   <input 
+                      type="date" 
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   />
+                </div>
+             )}
+          </div>
+        </div>
+
+        {/* 4 cards de resumo em grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <Card className="flex flex-col justify-center">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Vendas Hoje</h4>
+            <div className="flex items-center gap-2">
+               {loading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(dailyReport?.todaySales || 0)}</p>}
+            </div>
+          </Card>
+          
+          <Card className="flex flex-col justify-center">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Ticket Médio</h4>
+            <div className="flex items-center gap-2">
+               {loading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(dailyReport?.averageTicket || 0)}</p>}
+            </div>
+          </Card>
+          
+          <Card className="flex flex-col justify-center">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Total de Vendas</h4>
+            <div className="flex items-center gap-2">
+               {loading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-gray-900 dark:text-white">{dailyReport?.totalOrders || 0}</p>}
+            </div>
+          </Card>
+          
+          <Card className="flex flex-col justify-center">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Estoque Baixo</h4>
+            <div className="flex items-center gap-2 pt-1">
+               {loading ? (
+                  <Spinner size="sm" /> 
+               ) : (
+                  <div className="flex items-center gap-3">
+                     <p className="text-2xl font-bold text-gray-900 dark:text-white leading-none">{lowStockCount || 0}</p>
+                     {lowStockCount !== null && lowStockCount > 0 && (
+                        <Badge variant="danger">{lowStockCount} produtos</Badge>
+                     )}
+                  </div>
+               )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+          <Card title="Vendas Histórico (30 dias)" className="min-h-[350px]">
+             {loading && salesData.length === 0 ? (
+                <div className="flex items-center justify-center h-[280px]"><Spinner /></div>
+             ) : (
+                <div className="h-[280px] w-full mt-4">
+                   <ResponsiveContainer width="100%" height="100%">
+                     <LineChart data={salesData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                       <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} />
+                       <YAxis stroke="#6b7280" fontSize={12} tickLine={false} tickFormatter={(value) => `R$ ${value}`} />
+                       <RechartsTooltip 
+                          formatter={(value: number) => [formatCurrency(value), 'Vendas']}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                       />
+                       <Line type="monotone" dataKey="value" stroke="#0ea5e9" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                     </LineChart>
+                   </ResponsiveContainer>
+                </div>
+             )}
+          </Card>
+
+          <Card title="Top 10 Produtos (Semana)" className="min-h-[350px]">
+             {loading && topProducts.length === 0 ? (
+                <div className="flex items-center justify-center h-[280px]"><Spinner /></div>
+             ) : (
+                <div className="h-[280px] w-full mt-4">
+                   <ResponsiveContainer width="100%" height="100%">
+                     <BarChart data={topProducts} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 40 }}>
+                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
+                       <XAxis type="number" stroke="#6b7280" fontSize={12} />
+                       <YAxis dataKey="name" type="category" stroke="#6b7280" fontSize={12} tickLine={false} width={100} />
+                       <RechartsTooltip 
+                          formatter={(value: number) => [value, 'Quantidade']}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                       />
+                       <Bar dataKey="sales" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
+                     </BarChart>
+                   </ResponsiveContainer>
+                </div>
+             )}
+          </Card>
+        </div>
+      </>
+    );
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar simulada */}
       {isMenuOpen && (
         <aside className="w-64 bg-primary-600 text-white flex flex-col p-6 shadow-xl">
@@ -105,48 +326,7 @@ export default function Dashboard() {
         </header>
 
         <section className="p-8 flex-1 overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 flex flex-col items-center justify-center min-h-[400px] text-center mb-6">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-inner">
-              <svg
-                className="w-10 h-10"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-              Painel do Administrador
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-              Você está autenticado de forma persistente através do Zustand Persist Middleware. E as
-              requisições (interceptors) estão acopladas à lógica de Token do Axios.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Status da API (Axios)
-              </h4>
-              <p className="text-gray-900 dark:text-white font-semibold truncate">{data}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Estado Atual (Zustand)
-              </h4>
-              <p className="text-gray-900 dark:text-white font-semibold capitalize">
-                {isMenuOpen ? 'Menu Aberto' : 'Menu Fechado'}
-              </p>
-            </div>
-          </div>
+          {renderContent()}
         </section>
       </main>
     </div>
