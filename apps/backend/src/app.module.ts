@@ -9,7 +9,8 @@ import { CashierModule } from './modules/cashier/cashier.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { StockModule } from './modules/stock/stock.module';
-import { UsersModule } from './modules/users/users.module';
+import { CashierModule } from './modules/cashier/cashier.module';
+import { FiscalModule } from './modules/fiscal/fiscal.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { UsersModule } from './modules/users/users.module';
     StockModule,
     SalesModule,
     CashierModule,
-    // FiscalModule, ReportsModule — próximas fases
+    FiscalModule,
+    // ReportsModule — próximas fases
   ],
   providers: [
     {

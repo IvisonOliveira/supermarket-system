@@ -32,7 +32,7 @@ export class SalesService {
 
     const { data: products, error: prodErr } = await this.supabase
       .from('products')
-      .select('id, name, barcode, price')
+      .select('id, name, barcode, price, ncm')
       .in('id', productIds);
 
     if (prodErr) throw new ConflictException(`Erro ao buscar produtos: ${prodErr.message}`);
@@ -51,7 +51,8 @@ export class SalesService {
         unit_price: item.unit_price,
         product_name_snapshot: product.name,
         product_barcode_snapshot: product.barcode,
-        subtotal,
+        ncm_snapshot: product.ncm || '00000000',
+        subtotal
       };
     });
 
@@ -113,22 +114,23 @@ export class SalesService {
         const productIds = saleDto.items.map((i) => i.product_id);
         const { data: products } = await this.supabase
           .from('products')
-          .select('id, name, barcode')
+          .select('id, name, barcode, ncm')
           .in('id', productIds);
 
         let total = 0;
-        const saleItemsData = saleDto.items.map((item) => {
-          const product = products?.find((p) => p.id === item.product_id);
-          const subtotal = item.qty * item.unit_price;
-          total += subtotal;
-          return {
-            product_id: item.product_id,
-            quantity: item.qty,
-            unit_price: item.unit_price,
-            product_name_snapshot: product ? product.name : 'Produto Desconhecido',
-            product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
-            subtotal,
-          };
+        const saleItemsData = saleDto.items.map(item => {
+           const product = products?.find(p => p.id === item.product_id);
+           const subtotal = item.qty * item.unit_price;
+           total += subtotal;
+           return {
+             product_id: item.product_id,
+             quantity: item.qty,
+             unit_price: item.unit_price,
+             product_name_snapshot: product ? product.name : 'Produto Desconhecido',
+             product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
+             ncm_snapshot: product && product.ncm ? product.ncm : '00000000',
+             subtotal
+           };
         });
 
         const finalTotal = Math.max(0, total - saleDto.discount);
