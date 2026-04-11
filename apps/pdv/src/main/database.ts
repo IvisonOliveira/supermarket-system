@@ -59,27 +59,34 @@ export function insertSale(sale: any) {
 }
 
 export function getPendingSales() {
-  return db.prepare("SELECT * FROM local_sales WHERE status = 'pending'").all().map((s: any) => ({
-    ...s,
-    items: JSON.parse(s.items)
-  }));
+  return db
+    .prepare("SELECT * FROM local_sales WHERE status = 'pending'")
+    .all()
+    .map((s: any) => ({
+      ...s,
+      items: JSON.parse(s.items),
+    }));
 }
 
 export function markSaleSynced(id: string) {
-  db.prepare("UPDATE local_sales SET status = 'synced', synced_at = ? WHERE id = ?").run(new Date().toISOString(), id);
+  db.prepare("UPDATE local_sales SET status = 'synced', synced_at = ? WHERE id = ?").run(
+    new Date().toISOString(),
+    id,
+  );
 }
 
 export function searchProducts(query: string) {
-  return db.prepare("SELECT * FROM local_products WHERE name LIKE ? OR barcode LIKE ? LIMIT 50")
+  return db
+    .prepare('SELECT * FROM local_products WHERE name LIKE ? OR barcode LIKE ? LIMIT 50')
     .all(`%${query}%`, `%${query}%`);
 }
 
 export function getProductByBarcode(barcode: string) {
-  return db.prepare("SELECT * FROM local_products WHERE barcode = ?").get(barcode);
+  return db.prepare('SELECT * FROM local_products WHERE barcode = ?').get(barcode);
 }
 
 export function getProducts() {
-  return db.prepare("SELECT * FROM local_products").all();
+  return db.prepare('SELECT * FROM local_products').all();
 }
 
 export function upsertProducts(products: any[]) {
@@ -106,7 +113,7 @@ export function upsertProducts(products: any[]) {
         unit: p.unit,
         stock_qty: p.stock_qty,
         image_url: p.image_url,
-        updated_at: p.updated_at
+        updated_at: p.updated_at,
       });
     }
   });

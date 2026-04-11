@@ -5,16 +5,12 @@ import {
   ConflictException,
   Logger,
 } from '@nestjs/common';
+
+import { SupabaseConfig } from '../../config/supabase.config';
 import { StockService } from '../stock/stock.service';
+
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { SyncSalesDto } from './dto/sync-sales.dto';
-import { SupabaseConfig } from '../../config/supabase.config';
-
-interface FindAllOptions {
-  cashierId?: string;
-  from?: string;
-  to?: string;
-}
 
 const CANCEL_WINDOW_MS = 30 * 60 * 1000;
 
@@ -32,8 +28,8 @@ export class SalesService {
   }
 
   async create(dto: CreateSaleDto, operatorId: string): Promise<any> {
-    const productIds = dto.items.map(i => i.product_id);
-    
+    const productIds = dto.items.map((i) => i.product_id);
+
     const { data: products, error: prodErr } = await this.supabase
       .from('products')
       .select('id, name, barcode, price')
@@ -42,10 +38,10 @@ export class SalesService {
     if (prodErr) throw new ConflictException(`Erro ao buscar produtos: ${prodErr.message}`);
 
     let total = 0;
-    const saleItemsData = dto.items.map(item => {
-      const product = products?.find(p => p.id === item.product_id);
+    const saleItemsData = dto.items.map((item) => {
+      const product = products?.find((p) => p.id === item.product_id);
       if (!product) throw new NotFoundException(`Produto ${item.product_id} não encontrado`);
-      
+
       const subtotal = item.qty * item.unit_price;
       total += subtotal;
 
@@ -55,7 +51,7 @@ export class SalesService {
         unit_price: item.unit_price,
         product_name_snapshot: product.name,
         product_barcode_snapshot: product.barcode,
-        subtotal
+        subtotal,
       };
     });
 
@@ -70,33 +66,33 @@ export class SalesService {
         discount: dto.discount,
         change_amount: dto.change,
         total: finalTotal,
-        status: 'completed'
+        status: 'completed',
       })
       .select()
       .single();
 
     if (saleErr) throw new ConflictException(`Erro ao criar venda: ${saleErr.message}`);
 
-    const itemsToInsert = saleItemsData.map(item => ({ ...item, sale_id: sale.id }));
-    const { error: itemsErr } = await this.supabase
-      .from('sale_items')
-      .insert(itemsToInsert);
+    const itemsToInsert = saleItemsData.map((item) => ({ ...item, sale_id: sale.id }));
+    const { error: itemsErr } = await this.supabase.from('sale_items').insert(itemsToInsert);
 
     if (itemsErr) {
-       await this.supabase.from('sales').delete().eq('id', sale.id);
-       throw new ConflictException(`Erro ao inserir itens da venda: ${itemsErr.message}`);
+      await this.supabase.from('sales').delete().eq('id', sale.id);
+      throw new ConflictException(`Erro ao inserir itens da venda: ${itemsErr.message}`);
     }
 
     await this.stockService.registerSaleMovements(
-      sale.id,
-      dto.items.map(i => ({ productId: i.product_id, qty: i.qty })),
-      operatorId
+      sale.id as string,
+      dto.items.map((i) => ({ productId: i.product_id, qty: i.qty })),
+      operatorId,
     );
 
-    return this.findById(sale.id);
+    return this.findById(sale.id as string);
   }
 
-  async sync(dto: SyncSalesDto): Promise<{ synced: string[], duplicates: string[], errors: string[] }> {
+  async sync(
+    dto: SyncSalesDto,
+  ): Promise<{ synced: string[]; duplicates: string[]; errors: string[] }> {
     const synced: string[] = [];
     const duplicates: string[] = [];
     const errors: string[] = [];
@@ -114,59 +110,55 @@ export class SalesService {
           continue;
         }
 
-        const productIds = saleDto.items.map(i => i.product_id);
+        const productIds = saleDto.items.map((i) => i.product_id);
         const { data: products } = await this.supabase
           .from('products')
           .select('id, name, barcode')
           .in('id', productIds);
 
         let total = 0;
-        const saleItemsData = saleDto.items.map(item => {
-           const product = products?.find(p => p.id === item.product_id);
-           const subtotal = item.qty * item.unit_price;
-           total += subtotal;
-           return {
-             product_id: item.product_id,
-             quantity: item.qty,
-             unit_price: item.unit_price,
-             product_name_snapshot: product ? product.name : 'Produto Desconhecido',
-             product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
-             subtotal
-           };
+        const saleItemsData = saleDto.items.map((item) => {
+          const product = products?.find((p) => p.id === item.product_id);
+          const subtotal = item.qty * item.unit_price;
+          total += subtotal;
+          return {
+            product_id: item.product_id,
+            quantity: item.qty,
+            unit_price: item.unit_price,
+            product_name_snapshot: product ? product.name : 'Produto Desconhecido',
+            product_barcode_snapshot: product ? product.barcode : 'SIM-CODIGO',
+            subtotal,
+          };
         });
-        
+
         const finalTotal = Math.max(0, total - saleDto.discount);
 
-        const { error: saleErr } = await this.supabase
-          .from('sales')
-          .insert({
-            id: saleDto.id,
-            cashier_session_id: saleDto.cashier_session_id,
-            operator_id: 'SYNC_OFFLINE',
-            payment_method: saleDto.payment_method,
-            discount: saleDto.discount,
-            change_amount: saleDto.change,
-            total: finalTotal,
-            status: 'completed',
-            created_at: saleDto.created_at
-          });
+        const { error: saleErr } = await this.supabase.from('sales').insert({
+          id: saleDto.id,
+          cashier_session_id: saleDto.cashier_session_id,
+          operator_id: 'SYNC_OFFLINE',
+          payment_method: saleDto.payment_method,
+          discount: saleDto.discount,
+          change_amount: saleDto.change,
+          total: finalTotal,
+          status: 'completed',
+          created_at: saleDto.created_at,
+        });
 
         if (saleErr) throw new Error(saleErr.message);
 
-        const itemsToInsert = saleItemsData.map(item => ({ ...item, sale_id: saleDto.id }));
-        const { error: itemsErr } = await this.supabase
-          .from('sale_items')
-          .insert(itemsToInsert);
+        const itemsToInsert = saleItemsData.map((item) => ({ ...item, sale_id: saleDto.id }));
+        const { error: itemsErr } = await this.supabase.from('sale_items').insert(itemsToInsert);
 
         if (itemsErr) {
-           await this.supabase.from('sales').delete().eq('id', saleDto.id);
-           throw new Error(itemsErr.message);
+          await this.supabase.from('sales').delete().eq('id', saleDto.id);
+          throw new Error(itemsErr.message);
         }
 
         await this.stockService.registerSaleMovements(
           saleDto.id,
-          saleDto.items.map(i => ({ productId: i.product_id, qty: i.qty })),
-          'SYNC_OFFLINE'
+          saleDto.items.map((i) => ({ productId: i.product_id, qty: i.qty })),
+          'SYNC_OFFLINE',
         );
 
         synced.push(saleDto.id);
@@ -175,21 +167,26 @@ export class SalesService {
       }
     }
 
-    this.logger.log(`[SYNC] Sincronização finalizada em ${new Date().toISOString()}. Synced: ${synced.length}, Duplicates: ${duplicates.length}, Errors: ${errors.length}`);
+    this.logger.log(
+      `[SYNC] Sincronização finalizada em ${new Date().toISOString()}. Synced: ${synced.length}, Duplicates: ${duplicates.length}, Errors: ${errors.length}`,
+    );
 
     return { synced, duplicates, errors };
   }
 
   async findByPeriod(from?: string, to?: string, cashierId?: string): Promise<any[]> {
-    let query = this.supabase.from('sales').select('*, items:sale_items(*)').order('created_at', { ascending: false });
-    
+    let query = this.supabase
+      .from('sales')
+      .select('*, items:sale_items(*)')
+      .order('created_at', { ascending: false });
+
     if (cashierId) query = query.eq('cashier_session_id', cashierId);
     if (from) query = query.gte('created_at', from);
     if (to) query = query.lte('created_at', to);
 
     const { data, error } = await query;
     if (error) throw new ConflictException(`Erro ao buscar vendas: ${error.message}`);
-    
+
     return data || [];
   }
 
@@ -214,7 +211,7 @@ export class SalesService {
       throw new BadRequestException('A venda já está cancelada');
     }
 
-    const elapsed = Date.now() - new Date(sale.created_at).getTime();
+    const elapsed = Date.now() - new Date(sale.created_at as string).getTime();
     if (elapsed > CANCEL_WINDOW_MS) {
       throw new BadRequestException('Cancelamento permitido apenas até 30 minutos após a emissão');
     }
@@ -228,9 +225,12 @@ export class SalesService {
 
     // Reverte o estoque passando quantidades negativas para descontar da baixa
     await this.stockService.registerSaleMovements(
-      sale.id,
-      sale.items.map((i: any) => ({ productId: i.product_id, qty: -i.quantity })),
-      operatorId
+      sale.id as string,
+      sale.items.map((i: any) => ({
+        productId: i.product_id as string,
+        qty: -i.quantity as number,
+      })),
+      operatorId,
     );
 
     return this.findById(id);

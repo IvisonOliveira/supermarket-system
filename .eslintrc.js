@@ -39,7 +39,10 @@ module.exports = {
   rules: {
     // --- TypeScript ---
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
     '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 
     // --- Imports ---
@@ -56,7 +59,7 @@ module.exports = {
 
     // --- Geral ---
     'no-console': ['warn', { allow: ['warn', 'error'] }],
-    'eqeqeq': ['error', 'always'],
+    eqeqeq: ['error', 'always'],
     'no-var': 'error',
     'prefer-const': 'error',
   },
@@ -70,7 +73,7 @@ module.exports = {
     'coverage/',
     'node_modules/',
     '*.js',
-    '!.eslintrc.js',         // este arquivo
+    '!.eslintrc.js', // este arquivo
     '!apps/*/.eslintrc.js', // configs dos apps
   ],
 };

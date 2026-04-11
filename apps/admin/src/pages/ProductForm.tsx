@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import api from '../services/api';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+import { z } from 'zod';
+
 import { Input, Select, Button, Spinner } from '../components/ui';
 import ImageUpload from '../components/ui/ImageUpload';
+import api from '../services/api';
 
 const productSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
@@ -58,7 +58,8 @@ export default function ProductForm() {
 
   useEffect(() => {
     // Carregar categorias
-    api.get('/categories')
+    api
+      .get('/categories')
       .then((res) => {
         const cats = Array.isArray(res.data) ? res.data : res.data.data || [];
         setCategories(cats);
@@ -67,7 +68,8 @@ export default function ProductForm() {
 
     // Carregar produto se estiver em modo de edição
     if (isEditing) {
-      api.get(`/products/${id}`)
+      api
+        .get(`/products/${id}`)
         .then((res) => {
           const product = res.data;
           reset({
@@ -99,14 +101,14 @@ export default function ProductForm() {
     for (let i = 0; i < 9; i++) {
       ean += Math.floor(Math.random() * 10).toString();
     }
-    
+
     let sum = 0;
     for (let i = 0; i < 12; i++) {
       sum += parseInt(ean[i]) * (i % 2 === 0 ? 1 : 3);
     }
     const checkDigit = (10 - (sum % 10)) % 10;
     const finalBarcode = ean + checkDigit;
-    
+
     setValue('barcode', finalBarcode, { shouldValidate: true });
   };
 
@@ -133,7 +135,7 @@ export default function ProductForm() {
       } else {
         const res = await api.post('/products', payload);
         const newId = res.data.id;
-        
+
         if (imageFile && newId) {
           const formData = new FormData();
           formData.append('file', imageFile);
@@ -168,9 +170,12 @@ export default function ProductForm() {
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-800 p-6 rounded shadow-sm space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white dark:bg-gray-800 p-6 rounded shadow-sm space-y-6"
+      >
         <div className="mb-6">
-          <ImageUpload 
+          <ImageUpload
             currentImageUrl={currentImageUrl}
             onUpload={(file) => {
               setImageFile(file);
@@ -186,11 +191,11 @@ export default function ProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Nome */}
           <div className="md:col-span-2">
-            <Input 
-              label="Nome do Produto *" 
-              placeholder="Ex: Arroz Tipo 1" 
-              error={errors.name?.message} 
-              {...register('name')} 
+            <Input
+              label="Nome do Produto *"
+              placeholder="Ex: Arroz Tipo 1"
+              error={errors.name?.message}
+              {...register('name')}
             />
           </div>
 
@@ -198,11 +203,11 @@ export default function ProductForm() {
           <div>
             <div className="flex gap-2 items-end">
               <div className="flex-1">
-                <Input 
-                  label="Código de Barras (EAN-13)" 
-                  placeholder="Ex: 7891000000000" 
-                  error={errors.barcode?.message} 
-                  {...register('barcode')} 
+                <Input
+                  label="Código de Barras (EAN-13)"
+                  placeholder="Ex: 7891000000000"
+                  error={errors.barcode?.message}
+                  {...register('barcode')}
                 />
               </div>
               <Button type="button" variant="secondary" onClick={generateBarcode}>
@@ -219,32 +224,32 @@ export default function ProductForm() {
               {...register('category_id')}
               options={[
                 { value: '', label: 'Nenhuma ou Selecione...' },
-                ...categories.map(c => ({ value: c.id, label: c.name }))
+                ...categories.map((c) => ({ value: c.id, label: c.name })),
               ]}
             />
           </div>
 
           {/* Preço */}
           <div>
-            <Input 
-              label="Preço de Venda (R$) *" 
-              type="number" 
-              step="0.01" 
+            <Input
+              label="Preço de Venda (R$) *"
+              type="number"
+              step="0.01"
               min="0"
-              error={errors.price?.message} 
-              {...register('price')} 
+              error={errors.price?.message}
+              {...register('price')}
             />
           </div>
 
           {/* Custo */}
           <div>
-            <Input 
-              label="Custo (R$)" 
-              type="number" 
-              step="0.01" 
+            <Input
+              label="Custo (R$)"
+              type="number"
+              step="0.01"
               min="0"
-              error={errors.cost?.message} 
-              {...register('cost')} 
+              error={errors.cost?.message}
+              {...register('cost')}
             />
           </div>
 
@@ -257,50 +262,50 @@ export default function ProductForm() {
               options={[
                 { value: 'un', label: 'Unidade (UN)' },
                 { value: 'kg', label: 'Quilo (KG)' },
-                { value: 'l', label: 'Litro (L)' }
+                { value: 'l', label: 'Litro (L)' },
               ]}
             />
           </div>
 
           {/* NCM */}
           <div>
-            <Input 
-              label="NCM" 
-              placeholder="Ex: 10063021" 
-              error={errors.ncm?.message} 
-              {...register('ncm')} 
+            <Input
+              label="NCM"
+              placeholder="Ex: 10063021"
+              error={errors.ncm?.message}
+              {...register('ncm')}
             />
           </div>
 
           {/* Estoque atual */}
           <div>
-            <Input 
-              label="Estoque Atual" 
-              type="number" 
+            <Input
+              label="Estoque Atual"
+              type="number"
               min="0"
-              error={errors.stock_qty?.message} 
-              {...register('stock_qty')} 
+              error={errors.stock_qty?.message}
+              {...register('stock_qty')}
             />
           </div>
 
           {/* Estoque mínimo */}
           <div>
-            <Input 
-              label="Estoque Mínimo" 
-              type="number" 
+            <Input
+              label="Estoque Mínimo"
+              type="number"
               min="0"
-              error={errors.stock_min?.message} 
-              {...register('stock_min')} 
+              error={errors.stock_min?.message}
+              {...register('stock_min')}
             />
           </div>
 
           {/* Ativo */}
           <div className="md:col-span-2 flex items-center mt-2">
             <label className="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300">
-              <input 
-                type="checkbox" 
-                className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 flex-shrink-0" 
-                {...register('active')} 
+              <input
+                type="checkbox"
+                className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 flex-shrink-0"
+                {...register('active')}
               />
               <span className="font-medium">Produto Ativo</span>
             </label>

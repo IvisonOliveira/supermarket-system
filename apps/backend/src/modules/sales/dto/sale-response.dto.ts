@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
 import { PaymentMethod, SaleStatus } from '@supermarket/shared';
 
 class SaleItemResponseDto {
@@ -20,7 +19,8 @@ export class SaleResponseDto {
   @ApiProperty() subtotal: number;
   @ApiProperty() discount: number;
   @ApiProperty() total: number;
-  @ApiProperty({ enum: ['dinheiro', 'credito', 'debito', 'pix', 'voucher'] }) paymentMethod: PaymentMethod;
+  @ApiProperty({ enum: ['dinheiro', 'credito', 'debito', 'pix', 'voucher'] })
+  paymentMethod: PaymentMethod;
   @ApiProperty() paymentAmount: number;
   @ApiProperty() change: number;
   @ApiProperty({ enum: ['pending', 'synced', 'cancelled'] }) status: SaleStatus;

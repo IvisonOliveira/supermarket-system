@@ -25,23 +25,23 @@ export function startSyncService() {
             items: s.items.map((i: any) => ({
               product_id: i.product_id || i.id,
               qty: i.qty || i.quantity,
-              unit_price: i.unit_price || i.price
+              unit_price: i.unit_price || i.price,
             })),
             discount: Number(s.discount) || 0,
             change: Number(s.change) || 0,
             payment_method: s.payment_method || 'dinheiro',
-            created_at: s.created_at
-          }))
+            created_at: s.created_at,
+          })),
         };
 
         const syncRes = await fetch(`${API_URL}/sales/sync`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
 
         if (syncRes.ok) {
-          const data = await syncRes.json() as any;
+          const data = (await syncRes.json()) as any;
           if (data && data.synced) {
             for (const id of data.synced) {
               markSaleSynced(id);
@@ -51,10 +51,12 @@ export function startSyncService() {
       }
 
       // 3. Atualiza Produtos Locais
-      const prodRes = await fetch(`${API_URL}/products?updated_after=${encodeURIComponent(lastSyncTime)}`);
+      const prodRes = await fetch(
+        `${API_URL}/products?updated_after=${encodeURIComponent(lastSyncTime)}`,
+      );
       let updatedProductsCount = 0;
       if (prodRes.ok) {
-        const updatedProducts = await prodRes.json() as any[];
+        const updatedProducts = (await prodRes.json()) as any[];
         if (updatedProducts && updatedProducts.length > 0) {
           upsertProducts(updatedProducts);
           updatedProductsCount = updatedProducts.length;
@@ -63,7 +65,9 @@ export function startSyncService() {
 
       lastSyncTime = new Date().toISOString();
 
-      console.log(`[SYNC] ${new Date().toISOString()} | Vendas enviadas: ${pendingSales.length} | Produtos atual: ${updatedProductsCount}`);
+      console.log(
+        `[SYNC] ${new Date().toISOString()} | Vendas enviadas: ${pendingSales.length} | Produtos atual: ${updatedProductsCount}`,
+      );
     } catch (err: any) {
       // Falha silenciosa offline
     }

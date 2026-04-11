@@ -4,13 +4,13 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 
-import { IbptService } from './services/ibpt.service';
-
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { IbptService } from './services/ibpt.service';
 
 @Injectable()
 export class ProductsService {
@@ -130,7 +130,7 @@ export class ProductsService {
         .eq('barcode', dto.barcode)
         .neq('id', id)
         .maybeSingle();
-      
+
       if (existing) {
         throw new ConflictException(`Produto com código de barras ${dto.barcode} já existe.`);
       }

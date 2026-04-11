@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
 import { StockMovementType } from '@supermarket/shared';
 
 export class MovementResponseDto {

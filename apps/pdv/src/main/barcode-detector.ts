@@ -15,20 +15,20 @@ export function initBarcodeDetector() {
 
         if (input.key === 'Enter') {
           const totalTime = Date.now() - firstKeyTime;
-          
+
           // Verifica se é scanner: >= 8 caracteres em menos de 100ms
           const isScanner = barcodeBuffer.length >= 8 && totalTime <= 100;
-          
+
           if (barcodeBuffer.length > 0) {
             // Envia o código para o renderer
             webContents.send(IPC.BARCODE_SCANNED, {
               code: barcodeBuffer,
-              isScanner
+              isScanner,
             });
           }
-          
+
           barcodeBuffer = '';
-        } else if (input.key.length === 1) { 
+        } else if (input.key.length === 1) {
           barcodeBuffer += input.key;
         }
       }

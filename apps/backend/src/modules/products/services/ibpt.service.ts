@@ -61,7 +61,7 @@ export class IbptService {
         return null;
       }
 
-      const data = await response.json() as IbptResponse;
+      const data = (await response.json()) as IbptResponse;
 
       const taxes: IbptTaxes = {
         federal: data?.Nacional || data?.nacional || data?.AliqNac || 0,

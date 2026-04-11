@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as Papa from 'papaparse';
+
 import { ProductsService } from '../products.service';
 
 export interface ImportReport {
@@ -39,18 +40,18 @@ export class CsvImportService {
         const nome = row['nome']?.trim();
         const precoStr = row['preco']?.replace(',', '.');
         const preco = precoStr ? parseFloat(precoStr) : 0;
-        
+
         const custoStr = row['custo']?.replace(',', '.');
         const custo = custoStr ? parseFloat(custoStr) : 0;
-        
+
         const estoqueStr = row['estoque_inicial'];
         const estoque = estoqueStr ? parseInt(estoqueStr, 10) : 0;
-        
+
         const ncm = row['ncm']?.trim();
         const codigo_barras = row['codigo_barras']?.trim();
         // A categoria precisaria do id uuid, se viesse o nome teríamos que fazer lookup
         // Pelo requisito enviamos diretamente se formos lidar com categorização posterior
-        
+
         if (!nome) {
           throw new Error('O nome do produto é obrigatório.');
         }

@@ -26,15 +26,18 @@ function createWindow(): void {
 
 import { startSyncService } from './sync-service';
 
-app.whenReady().then(() => {
-  registerIpcHandlers(ipcMain);
-  createWindow();
-  startSyncService();
+app
+  .whenReady()
+  .then(() => {
+    registerIpcHandlers(ipcMain);
+    createWindow();
+    startSyncService();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-}).catch(console.error);
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  })
+  .catch(console.error);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

@@ -1,6 +1,8 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import type { FormEvent } from 'react';
+
+import type { Column } from '../components/ui';
+import { Table, Button, Modal, Input, Select, Badge, Spinner } from '../components/ui';
 import { api } from '../services/api';
-import { Table, Button, Modal, Input, Select, Badge, Spinner, Column } from '../components/ui';
 
 interface User {
   id: string;
@@ -13,10 +15,10 @@ interface User {
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -90,15 +92,18 @@ export default function Users() {
 
   const roleBadge = (role: string) => {
     switch (role) {
-      case 'ADMIN': return <Badge variant="danger">Admin</Badge>;
-      case 'GERENTE': return <Badge variant="warning">Gerente</Badge>;
-      default: return <Badge variant="info">Operador</Badge>;
+      case 'ADMIN':
+        return <Badge variant="danger">Admin</Badge>;
+      case 'GERENTE':
+        return <Badge variant="warning">Gerente</Badge>;
+      default:
+        return <Badge variant="info">Operador</Badge>;
     }
   };
 
   const statusBadge = (isActive: boolean) => {
     // defaults to true if isActive is undefined, depending on backend implementation
-    const active = isActive !== false; 
+    const active = isActive !== false;
     return active ? (
       <Badge variant="success">Ativo</Badge>
     ) : (
@@ -109,32 +114,36 @@ export default function Users() {
   const columns: Column<User>[] = [
     { key: 'name', label: 'Nome' },
     { key: 'email', label: 'Email' },
-    { 
-      key: 'role', 
+    {
+      key: 'role',
       label: 'Perfil',
-      render: (u) => roleBadge(u.role)
+      render: (u) => roleBadge(u.role),
     },
-    { 
-      key: 'isActive', 
+    {
+      key: 'isActive',
       label: 'Status',
-      render: (u) => statusBadge(u.isActive)
+      render: (u) => statusBadge(u.isActive),
     },
     {
       key: 'actions',
       label: 'Ações',
       render: (u) => (
         <div className="flex gap-2">
-          <Button size="sm" variant="secondary" onClick={() => handleOpenEdit(u)}>Editar</Button>
-          <Button size="sm" variant="danger" onClick={() => handleDelete(u.id)}>Desativar</Button>
+          <Button size="sm" variant="secondary" onClick={() => handleOpenEdit(u)}>
+            Editar
+          </Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(u.id)}>
+            Desativar
+          </Button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const roleOptions = [
     { value: 'OPERADOR', label: 'Operador' },
     { value: 'GERENTE', label: 'Gerente' },
-    { value: 'ADMIN', label: 'Admin' }
+    { value: 'ADMIN', label: 'Admin' },
   ];
 
   return (
@@ -158,38 +167,40 @@ export default function Users() {
         title={editingUser ? 'Editar Usuário' : 'Novo Usuário'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input 
-            label="Nome" 
-            required 
+          <Input
+            label="Nome"
+            required
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
-          <Input 
-            label="Email" 
-            type="email" 
-            required 
+          <Input
+            label="Email"
+            type="email"
+            required
             value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
           {!editingUser && (
-            <Input 
-              label="Senha" 
-              type="password" 
-              required 
+            <Input
+              label="Senha"
+              type="password"
+              required
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           )}
-          <Select 
+          <Select
             label="Perfil"
             options={roleOptions}
             required
             value={formData.role}
-            onChange={(e) => setFormData({...formData, role: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
           />
-          
+
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+            <Button type="button" variant="secondary" onClick={handleCloseModal}>
+              Cancelar
+            </Button>
             <Button type="submit">Salvar</Button>
           </div>
         </form>

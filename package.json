@@ -8,20 +8,16 @@
   ],
   "scripts": {
     "dev:backend": "yarn workspace @supermarket/backend dev",
-    "dev:admin":   "yarn workspace @supermarket/admin dev",
-    "dev:pdv":     "yarn workspace @supermarket/pdv dev",
-
+    "dev:admin": "yarn workspace @supermarket/admin dev",
+    "dev:pdv": "yarn workspace @supermarket/pdv dev",
     "build:backend": "yarn workspace @supermarket/backend build",
-    "build:admin":   "yarn workspace @supermarket/admin build",
-    "build:pdv":     "yarn workspace @supermarket/pdv build",
-
-    "lint":       "yarn workspaces run lint",
+    "build:admin": "yarn workspace @supermarket/admin build",
+    "build:pdv": "yarn workspace @supermarket/pdv build",
+    "lint": "yarn workspaces run lint",
     "lint:check": "yarn workspaces run lint",
-
-    "format":       "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .prettierignore",
-
-    "test":    "yarn workspaces run test",
+    "test": "yarn workspaces run test",
     "test:ci": "yarn workspace @supermarket/backend test:ci && yarn workspace @supermarket/admin test:ci"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { StockMovementType } from '@supermarket/shared';
+import type { StockMovementType } from '@supermarket/shared';
 
 export class StockMovementEntity {
   id: string;

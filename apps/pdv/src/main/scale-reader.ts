@@ -17,7 +17,7 @@ export class ScaleReader {
         }
 
         this.parser = this.port!.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-        
+
         this.parser.on('data', (data: string) => {
           // Protocolo Toledo: P+NNNNN, onde NNNNN é o peso em gramas
           if (data.startsWith('P+')) {

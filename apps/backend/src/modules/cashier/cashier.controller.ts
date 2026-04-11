@@ -1,11 +1,21 @@
-import { Controller, Post, Get, Body, Param, UseGuards, ParseUUIDPipe, ConflictException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+  ConflictException,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser, RequestUser } from '../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+
 import { CashierService } from './cashier.service';
-import { OpenCashierDto } from './dto/open-cashier.dto';
 import { CloseCashierDto } from './dto/close-cashier.dto';
+import { OpenCashierDto } from './dto/open-cashier.dto';
 
 @ApiTags('cashier')
 @ApiBearerAuth()
@@ -16,19 +26,13 @@ export class CashierController {
 
   @Post('open')
   @ApiOperation({ summary: 'Abre um novo caixa para o operador logado' })
-  open(
-    @Body() dto: OpenCashierDto,
-    @CurrentUser() user: RequestUser,
-  ) {
+  open(@Body() dto: OpenCashierDto, @CurrentUser() user: RequestUser) {
     return this.cashierService.open(user.id, dto.cashier_id, dto.opening_amount);
   }
 
   @Post('close')
   @ApiOperation({ summary: 'Fecha o caixa atual do operador logado' })
-  async close(
-    @Body() dto: CloseCashierDto,
-    @CurrentUser() user: RequestUser,
-  ) {
+  async close(@Body() dto: CloseCashierDto, @CurrentUser() user: RequestUser) {
     const session = await this.cashierService.getCurrent(user.id);
     if (!session) {
       throw new ConflictException('Nenhum caixa aberto para fechamento.');

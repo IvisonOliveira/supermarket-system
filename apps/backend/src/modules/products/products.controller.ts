@@ -20,15 +20,16 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 
+import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { ProductsService } from './products.service';
+
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductFilterDto } from './dto/product-filter.dto';
-import { IbptService } from './services/ibpt.service';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
 import { CsvImportService } from './services/csv-import.service';
+import { IbptService } from './services/ibpt.service';
 
 @ApiTags('products')
 @ApiBearerAuth()
@@ -94,10 +95,7 @@ export class ProductsController {
   @Put(':id')
   @Roles('ADMIN', 'GERENTE')
   @ApiOperation({ summary: 'Atualizar produto parcialmente' })
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateProductDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProductDto) {
     return this.productsService.update(id, dto);
   }
 

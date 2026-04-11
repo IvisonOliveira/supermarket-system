@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuthStore } from '../store/useAppStore';
-import api from '../services/api';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
 import { Input, Button } from '../components/ui';
+import api from '../services/api';
+import { useAuthStore } from '../store/useAppStore';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('Formato de e-mail inválido'),
@@ -31,14 +31,15 @@ export default function Login() {
     setApiError(null);
     try {
       const response = await api.post('/auth/login', data);
-      
+
       // Extrai os dados baseado no formato esperado.
       const { user, token } = response.data;
-      
+
       login(user, token);
       navigate('/');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Falha ao autenticar. Verifique suas credenciais.';
+      const errorMessage =
+        error.response?.data?.message || 'Falha ao autenticar. Verifique suas credenciais.';
       setApiError(errorMessage);
     }
   };
@@ -50,7 +51,7 @@ export default function Login() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Login</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Acesso restrito ao painel</p>
         </div>
-        
+
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
             label="E-mail"
@@ -60,7 +61,7 @@ export default function Login() {
             disabled={isSubmitting}
             {...register('email')}
           />
-          
+
           <Input
             label="Senha"
             type="password"
@@ -70,12 +71,7 @@ export default function Login() {
             {...register('password')}
           />
 
-          <Button 
-            type="submit" 
-            variant="primary" 
-            className="w-full mt-2"
-            loading={isSubmitting}
-          >
+          <Button type="submit" variant="primary" className="w-full mt-2" loading={isSubmitting}>
             Entrar no Painel
           </Button>
 
