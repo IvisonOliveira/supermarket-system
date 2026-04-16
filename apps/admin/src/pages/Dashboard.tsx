@@ -315,7 +315,10 @@ export default function Dashboard() {
       {/* Sidebar simulada */}
       {isMenuOpen && (
         <aside className="w-64 bg-primary-600 text-white flex flex-col p-6 shadow-xl">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">SisAdmin</h2>
+          <div className="mb-8 flex flex-col items-center">
+            <img src="/logo.png" alt="OmniMarket" className="max-w-[140px]" />
+            <span className="text-sm mt-2 font-semibold">OmniMarket</span>
+          </div>
           <nav className="flex-1 space-y-2">
             <button className="w-full text-left py-2 px-3 bg-primary-700 rounded-lg hover:bg-primary-500 transition shadow">
               Dashboard Principal
@@ -355,11 +358,11 @@ export default function Dashboard() {
 
       {/* Área Principal */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 p-4 flex justify-between items-center z-10 transition-colors duration-300">
+        <header className="bg-brand-primary shadow-sm p-4 flex justify-between items-center z-10 transition-colors duration-300">
           <div className="flex items-center gap-4">
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition"
+              className="p-2 rounded-md hover:bg-white/10 text-white transition"
               aria-label="Alternar Menu"
             >
               <svg
@@ -377,15 +380,15 @@ export default function Dashboard() {
                 />
               </svg>
             </button>
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Visão Geral</h1>
+            <h1 className="text-xl font-semibold text-white">Visão Geral</h1>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+              <p className="text-sm font-medium text-white">{user?.name}</p>
+              <p className="text-xs text-white/80 capitalize">{user?.role}</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold border-2 border-primary-500">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-brand-primary font-bold border-2 border-white">
               {user?.name?.charAt(0) || 'U'}
             </div>
           </div>

@@ -5,6 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          primary: '#0f2b4c',
+          secondary: '#cda03f',
+          accent: '#e8b74f',
+        },
         // Paleta base do PDV — fundo escuro para uso em ambiente de loja
         pdv: {
           bg: '#111827', // gray-900

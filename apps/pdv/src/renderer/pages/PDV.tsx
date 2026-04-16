@@ -318,7 +318,7 @@ export default function PDV() {
             </div>
             <div className="text-right">
               <p className="text-3xl text-gray-400 mb-2 font-medium tracking-wide">TOTAL GERAL</p>
-              <p className="text-7xl font-black text-green-400 tracking-tighter">
+              <p className="text-7xl font-black text-brand-primary tracking-tighter">
                 R$ {calculateTotal().toFixed(2)}
               </p>
             </div>
@@ -343,15 +343,18 @@ export default function PDV() {
 
       {/* PAINEL DIREITO: BUSCA E ATALHOS (40%) */}
       <div className="w-[40%] flex flex-col p-8 bg-gray-900 border-l border-black/50 shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10 relative">
-        <input
-          ref={searchInputRef}
-          autoFocus
-          className="w-full bg-gray-800 border-2 border-gray-700 text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all placeholder-gray-600 mb-8"
-          placeholder="CÓDIGO DE BARRAS"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+        <div className="flex items-center gap-4 mb-8">
+          <img src="/logo.png" alt="OmniMarket" className="max-h-[40px]" />
+          <input
+            ref={searchInputRef}
+            autoFocus
+            className="w-full bg-gray-800 border-2 border-gray-700 text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all placeholder-gray-600"
+            placeholder="CÓDIGO DE BARRAS"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           {searchQuery.trim() ? (
