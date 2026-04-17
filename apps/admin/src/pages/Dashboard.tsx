@@ -15,7 +15,6 @@ import { Badge } from '../components/ui/Badge';
 import { Card } from '../components/ui/Card';
 import { Spinner } from '../components/ui/Spinner';
 import { api } from '../services/api';
-import { useAuthStore, useUIStore } from '../store/useAppStore';
 
 interface DailyReport {
   todaySales: number;
@@ -34,9 +33,6 @@ interface TopProduct {
 }
 
 export default function Dashboard() {
-  const { isMenuOpen, toggleMenu } = useUIStore();
-  const { user, logout } = useAuthStore();
-
   const [period, setPeriod] = useState('HOJE');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -84,315 +80,273 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000); // Polling a cada 60s
+    const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-  const renderContent = () => {
-    if (loading && !dailyReport) {
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <Spinner size="lg" />
-          <p className="mt-4 text-gray-500">Carregando dados do dashboard...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
-          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Dados indisponíveis
-          </p>
-          <button
-            onClick={fetchData}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
-          >
-            Tentar novamente
-          </button>
-        </div>
-      );
-    }
-
+  if (loading && !dailyReport) {
     return (
-      <>
-        {/* Topo: seletor de período */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-4">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-              Resumo de Atividade
-            </h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-            >
-              <option value="HOJE">Hoje</option>
-              <option value="SEMANA">Esta Semana</option>
-              <option value="MES">Este Mês</option>
-              <option value="PERSONALIZADO">Personalizado</option>
-            </select>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <Spinner size="lg" />
+        <p className="mt-4 text-slate-500 text-sm">Carregando dashboard...</p>
+      </div>
+    );
+  }
 
-            {period === 'PERSONALIZADO' && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                <span className="text-gray-500">até</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-            )}
-          </div>
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <p className="text-lg font-semibold text-slate-700 mb-4">Dados indisponíveis</p>
+        <button
+          onClick={fetchData}
+          className="px-4 py-2 bg-[#1B2A5E] text-white rounded-lg hover:bg-[#152248] transition text-sm"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Filtro de período */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-[#1B2A5E]">Resumo de Atividade</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1B2A5E]/30 focus:border-[#1B2A5E]"
+          >
+            <option value="HOJE">Hoje</option>
+            <option value="SEMANA">Esta Semana</option>
+            <option value="MES">Este Mês</option>
+            <option value="PERSONALIZADO">Personalizado</option>
+          </select>
+          {period === 'PERSONALIZADO' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1B2A5E]/30"
+              />
+              <span className="text-slate-400 text-sm">até</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1B2A5E]/30"
+              />
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* 4 cards de resumo em grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <Card className="flex flex-col justify-center">
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-              Vendas Hoje
-            </h4>
-            <div className="flex items-center gap-2">
+      {/* Cards de KPI */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <Card>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Vendas Hoje
+              </p>
               {loading ? (
-                <Spinner size="sm" />
+                <Spinner size="sm" className="mt-2" />
               ) : (
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-[#1B2A5E] mt-1">
                   {formatCurrency(dailyReport?.todaySales || 0)}
                 </p>
               )}
             </div>
-          </Card>
+            <div className="w-10 h-10 rounded-xl bg-[#1B2A5E]/8 flex items-center justify-center">
+              <svg
+                className="w-5 h-5 text-[#1B2A5E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.75}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+        </Card>
 
-          <Card className="flex flex-col justify-center">
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-              Ticket Médio
-            </h4>
-            <div className="flex items-center gap-2">
+        <Card>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Ticket Médio
+              </p>
               {loading ? (
-                <Spinner size="sm" />
+                <Spinner size="sm" className="mt-2" />
               ) : (
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-[#1B2A5E] mt-1">
                   {formatCurrency(dailyReport?.averageTicket || 0)}
                 </p>
               )}
             </div>
-          </Card>
+            <div className="w-10 h-10 rounded-xl bg-[#C9A227]/10 flex items-center justify-center">
+              <svg
+                className="w-5 h-5 text-[#C9A227]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.75}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+            </div>
+          </div>
+        </Card>
 
-          <Card className="flex flex-col justify-center">
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-              Total de Vendas
-            </h4>
-            <div className="flex items-center gap-2">
+        <Card>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Total de Vendas
+              </p>
               {loading ? (
-                <Spinner size="sm" />
+                <Spinner size="sm" className="mt-2" />
               ) : (
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-[#1B2A5E] mt-1">
                   {dailyReport?.totalOrders || 0}
                 </p>
               )}
             </div>
-          </Card>
+            <div className="w-10 h-10 rounded-xl bg-[#1B2A5E]/8 flex items-center justify-center">
+              <svg
+                className="w-5 h-5 text-[#1B2A5E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.75}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
+          </div>
+        </Card>
 
-          <Card className="flex flex-col justify-center">
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-              Estoque Baixo
-            </h4>
-            <div className="flex items-center gap-2 pt-1">
+        <Card>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Estoque Baixo
+              </p>
               {loading ? (
-                <Spinner size="sm" />
+                <Spinner size="sm" className="mt-2" />
               ) : (
-                <div className="flex items-center gap-3">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
-                    {lowStockCount || 0}
-                  </p>
-                  {lowStockCount !== null && lowStockCount > 0 && (
-                    <Badge variant="danger">{lowStockCount} produtos</Badge>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-2xl font-bold text-[#1B2A5E]">{lowStockCount || 0}</p>
+                  {(lowStockCount ?? 0) > 0 && (
+                    <Badge variant="danger">{lowStockCount} itens</Badge>
                   )}
                 </div>
               )}
             </div>
-          </Card>
-        </div>
-
-        {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-          <Card title="Vendas Histórico (30 dias)" className="min-h-[350px]">
-            {loading && salesData.length === 0 ? (
-              <div className="flex items-center justify-center h-[280px]">
-                <Spinner />
-              </div>
-            ) : (
-              <div className="h-[280px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={salesData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                    <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} />
-                    <YAxis
-                      stroke="#6b7280"
-                      fontSize={12}
-                      tickLine={false}
-                      tickFormatter={(value) => `R$ ${value}`}
-                    />
-                    <RechartsTooltip
-                      formatter={(value: any) => [formatCurrency(value), 'Vendas']}
-                      contentStyle={{
-                        borderRadius: '8px',
-                        border: 'none',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#0ea5e9"
-                      strokeWidth={3}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </Card>
-
-          <Card title="Top 10 Produtos (Semana)" className="min-h-[350px]">
-            {loading && topProducts.length === 0 ? (
-              <div className="flex items-center justify-center h-[280px]">
-                <Spinner />
-              </div>
-            ) : (
-              <div className="h-[280px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={topProducts}
-                    layout="vertical"
-                    margin={{ top: 5, right: 20, bottom: 5, left: 40 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
-                    <XAxis type="number" stroke="#6b7280" fontSize={12} />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      stroke="#6b7280"
-                      fontSize={12}
-                      tickLine={false}
-                      width={100}
-                    />
-                    <RechartsTooltip
-                      formatter={(value: any) => [value, 'Quantidade']}
-                      contentStyle={{
-                        borderRadius: '8px',
-                        border: 'none',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                      }}
-                    />
-                    <Bar dataKey="sales" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </Card>
-        </div>
-      </>
-    );
-  };
-
-  return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* Sidebar simulada */}
-      {isMenuOpen && (
-        <aside className="w-64 bg-primary-600 text-white flex flex-col p-6 shadow-xl">
-          <h2 className="text-2xl font-bold tracking-tight mb-8">SisAdmin</h2>
-          <nav className="flex-1 space-y-2">
-            <button className="w-full text-left py-2 px-3 bg-primary-700 rounded-lg hover:bg-primary-500 transition shadow">
-              Dashboard Principal
-            </button>
-            <button className="w-full text-left py-2 px-3 hover:bg-primary-500 rounded-lg transition text-primary-50">
-              Usuários
-            </button>
-            <button className="w-full text-left py-2 px-3 hover:bg-primary-500 rounded-lg transition text-primary-50">
-              Configurações
-            </button>
-          </nav>
-
-          <div className="mt-auto pt-6 border-t border-primary-500">
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-red-500/20 text-red-100 hover:bg-red-500 hover:text-white rounded-lg transition"
-            >
+            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 text-red-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  strokeWidth={1.75}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              Sair
-            </button>
+            </div>
           </div>
-        </aside>
-      )}
+        </Card>
+      </div>
 
-      {/* Área Principal */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden">
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 p-4 flex justify-between items-center z-10 transition-colors duration-300">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={toggleMenu}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition"
-              aria-label="Alternar Menu"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+      {/* Gráficos */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <Card title="Vendas — Últimos 30 dias">
+          <div className="h-64 w-full mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={salesData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  tickLine={false}
+                  tickFormatter={(v) => `R$${v}`}
+                />
+                <RechartsTooltip
+                  formatter={(value: number) => [formatCurrency(value), 'Vendas']}
+                  contentStyle={{
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    fontSize: '12px',
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#C9A227"
+                  strokeWidth={2.5}
+                  dot={{ r: 3, fill: '#1B2A5E', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: '#C9A227' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card title="Top 10 Produtos — Esta Semana">
+          <div className="h-64 w-full mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={topProducts}
+                layout="vertical"
+                margin={{ top: 5, right: 10, bottom: 5, left: 40 }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+                <XAxis type="number" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  tickLine={false}
+                  width={90}
                 />
-              </svg>
-            </button>
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Visão Geral</h1>
+                <RechartsTooltip
+                  formatter={(value: number) => [value, 'Quantidade']}
+                  contentStyle={{
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    fontSize: '12px',
+                  }}
+                />
+                <Bar dataKey="sales" fill="#1B2A5E" radius={[0, 4, 4, 0]} barSize={16} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold border-2 border-primary-500">
-              {user?.name?.charAt(0) || 'U'}
-            </div>
-          </div>
-        </header>
-
-        <section className="p-8 flex-1 overflow-y-auto">{renderContent()}</section>
-      </main>
+        </Card>
+      </div>
     </div>
   );
 }

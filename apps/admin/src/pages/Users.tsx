@@ -1,4 +1,5 @@
 import type { FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 
 import type { Column } from '../components/ui';
 import { Table, Button, Modal, Input, Select, Badge, Spinner } from '../components/ui';
@@ -147,9 +148,9 @@ export default function Users() {
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold dark:text-white">Usuários</h1>
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-xl font-bold text-[#1B2A5E]">Usuários</h1>
         <Button onClick={handleOpenNew}>Novo Usuário</Button>
       </div>
 

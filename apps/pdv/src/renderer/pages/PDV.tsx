@@ -208,13 +208,13 @@ export default function PDV() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#0a111f] text-white overflow-hidden font-sans">
       {/* PAINEL ESQUERDO: VENDA ATUAL (60%) */}
-      <div className="w-[60%] flex flex-col border-r border-gray-700 bg-gray-800">
+      <div className="w-[60%] flex flex-col border-r border-[#1B2A5E] bg-[#0f1932]">
         {/* Lista de itens */}
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {items.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500 text-2xl font-light">
+            <div className="flex items-center justify-center h-full text-slate-500 text-2xl font-light">
               Caixa Livre - Passe o primeiro item...
             </div>
           ) : (
@@ -222,7 +222,7 @@ export default function PDV() {
               <div
                 id={`item-${index}`}
                 key={`${item.id}-${index}`}
-                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex ? 'bg-gray-800 border-green-500 ring-2 ring-green-500/50' : 'bg-gray-700 border-gray-600'}`}
+                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40' : 'bg-[#152248] border-[#1B2A5E]'}`}
               >
                 <div className="flex-1 pr-4">
                   <span className="text-white block text-2xl font-bold truncate">{item.name}</span>
@@ -232,7 +232,7 @@ export default function PDV() {
                   <div className="flex items-center">
                     {item.isWeighing ? (
                       <>
-                        <span className="w-24 text-center font-bold text-blue-400 text-3xl mr-4">
+                        <span className="w-24 text-center font-bold text-[#C9A227] text-3xl mr-4">
                           {currentScaleWeight.toFixed(3)} kg
                         </span>
                         <button
@@ -251,7 +251,7 @@ export default function PDV() {
                               ),
                             );
                           }}
-                          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 font-bold text-white transition-colors"
+                          className="px-4 py-2 bg-[#1B2A5E] border border-[#C9A227] rounded hover:bg-[#C9A227] hover:text-[#1B2A5E] font-bold text-white transition-colors"
                         >
                           Usar Peso
                         </button>
@@ -260,7 +260,7 @@ export default function PDV() {
                       <>
                         <button
                           onClick={() => updateQty(index, item.quantity - 1)}
-                          className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-500 font-bold text-xl transition-colors"
+                          className="px-3 py-1 bg-[#0f1932] border border-[#1B2A5E] rounded hover:bg-[#1B2A5E] font-bold text-xl transition-colors"
                         >
                           -
                         </button>
@@ -269,15 +269,15 @@ export default function PDV() {
                         </span>
                         <button
                           onClick={() => updateQty(index, item.quantity + 1)}
-                          className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-500 font-bold text-xl transition-colors"
+                          className="px-3 py-1 bg-[#0f1932] border border-[#1B2A5E] rounded hover:bg-[#1B2A5E] font-bold text-xl transition-colors"
                         >
                           +
                         </button>
                       </>
                     )}
                   </div>
-                  <span className="w-28 text-right text-gray-400">R$ {item.price.toFixed(2)}</span>
-                  <span className="w-36 text-right font-black text-white text-3xl">
+                  <span className="w-28 text-right text-slate-400">R$ {item.price.toFixed(2)}</span>
+                  <span className="w-36 text-right font-black text-[#C9A227] text-3xl">
                     R$ {item.subtotal.toFixed(2)}
                   </span>
                   <button
@@ -293,23 +293,23 @@ export default function PDV() {
         </div>
 
         {/* Rodapé fixo - Totais */}
-        <div className="bg-gray-900 p-8 border-t border-gray-700 shadow-[0_-10px_20px_rgba(0,0,0,0.1)]">
-          <div className="flex justify-between items-end mb-6 text-gray-300">
+        <div className="bg-[#0a111f] p-8 border-t border-[#1B2A5E] shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+          <div className="flex justify-between items-end mb-6 text-slate-300">
             <div>
-              <p className="text-2xl text-gray-400">
+              <p className="text-2xl text-slate-400">
                 Itens:{' '}
                 <span className="font-bold text-white ml-2">
                   {items.reduce((acc, i) => acc + i.quantity, 0)}
                 </span>
               </p>
               <div className="flex items-center mt-4 group">
-                <label htmlFor="discount" className="text-2xl text-gray-400">
+                <label htmlFor="discount" className="text-2xl text-slate-400">
                   Desconto: <span className="text-white">R$</span>
                 </label>
                 <input
                   id="discount"
                   type="number"
-                  className="bg-transparent border-b-2 border-gray-600 text-3xl font-bold ml-3 w-32 outline-none focus:border-green-400 group-hover:border-gray-500 transition-colors pt-1"
+                  className="bg-transparent border-b-2 border-[#1B2A5E] text-3xl font-bold ml-3 w-32 outline-none focus:border-[#C9A227] group-hover:border-slate-500 transition-colors pt-1"
                   value={discount || ''}
                   onChange={(e) => setDiscount(Number(e.target.value) || 0)}
                   placeholder="0.00"
@@ -317,8 +317,8 @@ export default function PDV() {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-3xl text-gray-400 mb-2 font-medium tracking-wide">TOTAL GERAL</p>
-              <p className="text-7xl font-black text-green-400 tracking-tighter">
+              <p className="text-3xl text-slate-400 mb-2 font-medium tracking-wide">TOTAL GERAL</p>
+              <p className="text-7xl font-black text-[#C9A227] tracking-tighter drop-shadow-[0_0_12px_rgba(201,162,39,0.4)]">
                 R$ {calculateTotal().toFixed(2)}
               </p>
             </div>
@@ -326,14 +326,14 @@ export default function PDV() {
           <div className="flex gap-4">
             <button
               onClick={clearSale}
-              className="flex-1 bg-red-600 hover:bg-red-500 text-white text-2xl font-bold py-6 rounded-lg transition-colors shadow-lg active:scale-95"
+              className="flex-1 bg-red-700/80 hover:bg-red-600 text-white text-2xl font-bold py-6 rounded-lg transition-colors shadow-lg active:scale-95"
             >
               CANCELAR
             </button>
             <button
               disabled={items.length === 0}
               onClick={() => setIsPaymentOpen(true)}
-              className="flex-[3] bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-4xl font-black py-6 rounded-lg transition-colors shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98]"
+              className="flex-[3] bg-[#1B2A5E] hover:bg-[#C9A227] hover:text-[#1B2A5E] disabled:opacity-40 disabled:cursor-not-allowed text-white text-4xl font-black py-6 rounded-lg border-2 border-[#C9A227] transition-all shadow-[0_0_20px_rgba(201,162,39,0.2)] hover:shadow-[0_0_28px_rgba(201,162,39,0.5)] active:scale-[0.98]"
             >
               FINALIZAR VENDA
             </button>
@@ -342,11 +342,15 @@ export default function PDV() {
       </div>
 
       {/* PAINEL DIREITO: BUSCA E ATALHOS (40%) */}
-      <div className="w-[40%] flex flex-col p-8 bg-gray-900 border-l border-black/50 shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10 relative">
+      <div className="w-[40%] flex flex-col p-8 bg-[#0a111f] border-l border-[#1B2A5E]/50 shadow-[-10px_0_20px_rgba(0,0,0,0.3)] z-10 relative">
+        {/* Logo no topo do painel */}
+        <div className="flex justify-center mb-6">
+          <img src="/logos/OmniMarket-Negative-Transparent.png" alt="OmniMarket" className="h-10" />
+        </div>
         <input
           ref={searchInputRef}
           autoFocus
-          className="w-full bg-gray-800 border-2 border-gray-700 text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all placeholder-gray-600 mb-8"
+          className="w-full bg-[#0f1932] border-2 border-[#1B2A5E] text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/30 transition-all placeholder-slate-600 mb-8"
           placeholder="CÓDIGO DE BARRAS"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -356,28 +360,28 @@ export default function PDV() {
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           {searchQuery.trim() ? (
             <div className="space-y-3">
-              <h3 className="text-gray-500 mb-4 font-bold tracking-widest text-sm uppercase">
+              <h3 className="text-slate-500 mb-4 font-bold tracking-widest text-sm uppercase">
                 Resultados ({searchResults.length})
               </h3>
               {searchResults.length === 0 ? (
-                <div className="p-8 bg-gray-800/50 rounded-lg text-center border border-gray-800 border-dashed">
-                  <p className="text-gray-400 text-xl">Nenhum produto encontrado</p>
-                  <p className="text-gray-500 mt-2 text-sm">Verifique o código ou descrição</p>
+                <div className="p-8 bg-[#0f1932]/50 rounded-lg text-center border border-[#1B2A5E] border-dashed">
+                  <p className="text-slate-400 text-xl">Nenhum produto encontrado</p>
+                  <p className="text-slate-500 mt-2 text-sm">Verifique o código ou descrição</p>
                 </div>
               ) : (
                 searchResults.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className="w-full text-left p-5 bg-gray-800 hover:bg-blue-600/80 rounded-lg mb-3 transition-colors flex justify-between items-center ring-offset-gray-900 focus:ring-4 focus:ring-blue-500 outline-none border border-transparent hover:border-blue-400 group"
+                    className="w-full text-left p-5 bg-[#0f1932] hover:bg-[#1B2A5E] rounded-lg mb-3 transition-colors flex justify-between items-center focus:ring-4 focus:ring-[#C9A227]/40 outline-none border border-[#1B2A5E] hover:border-[#C9A227] group"
                   >
                     <div>
-                      <div className="text-2xl font-bold text-gray-100 group-hover:text-white truncate max-w-[280px]">
+                      <div className="text-2xl font-bold text-slate-100 group-hover:text-white truncate max-w-[280px]">
                         {p.name}
                       </div>
-                      <div className="text-base font-mono text-gray-400 mt-2">{p.barcode}</div>
+                      <div className="text-base font-mono text-slate-500 mt-2">{p.barcode}</div>
                     </div>
-                    <div className="text-2xl font-black text-green-400 group-hover:text-green-300">
+                    <div className="text-2xl font-black text-[#C9A227] group-hover:text-[#e9be43]">
                       R$ {p.price.toFixed(2)}
                     </div>
                   </button>
@@ -386,27 +390,29 @@ export default function PDV() {
             </div>
           ) : (
             <div>
-              <h3 className="text-gray-500 mb-5 font-bold tracking-widest text-sm uppercase flex items-center justify-between">
+              <h3 className="text-slate-500 mb-5 font-bold tracking-widest text-sm uppercase flex items-center justify-between">
                 <span>Atalhos Rápidos</span>
-                <span className="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400">Top 12</span>
+                <span className="text-xs bg-[#0f1932] border border-[#1B2A5E] px-2 py-1 rounded text-slate-400">
+                  Top 12
+                </span>
               </h3>
               <div className="grid grid-cols-2 2xl:grid-cols-3 gap-4">
                 {searchResults.slice(0, 12).map((p) => (
                   <button
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className="bg-gray-800 hover:bg-gray-700 p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border border-gray-700 hover:border-gray-500 active:scale-95 group"
+                    className="bg-[#0f1932] hover:bg-[#1B2A5E] p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border border-[#1B2A5E] hover:border-[#C9A227] active:scale-95 group"
                   >
-                    <span className="text-center w-full mb-3 text-xl font-semibold text-gray-300 group-hover:text-white line-clamp-3 leading-snug">
+                    <span className="text-center w-full mb-3 text-xl font-semibold text-slate-300 group-hover:text-white line-clamp-3 leading-snug">
                       {p.name}
                     </span>
-                    <span className="text-green-400 text-3xl font-black mt-auto">
+                    <span className="text-[#C9A227] text-3xl font-black mt-auto">
                       R$ {p.price.toFixed(2)}
                     </span>
                   </button>
                 ))}
                 {searchResults.length === 0 && (
-                  <div className="col-span-full h-40 flex items-center justify-center text-gray-500 text-xl font-light bg-gray-800/30 rounded-lg border border-gray-800 border-dashed">
+                  <div className="col-span-full h-40 flex items-center justify-center text-slate-500 text-xl font-light bg-[#0f1932]/30 rounded-lg border border-[#1B2A5E] border-dashed">
                     Carregando catálogo...
                   </div>
                 )}
@@ -417,15 +423,15 @@ export default function PDV() {
       </div>
 
       {/* BARRA DE ATALHOS GLOBAL (RODAPÉ INFERIOR DIREITO) */}
-      <div className="absolute bottom-0 right-0 w-[40%] bg-gray-950 border-t border-gray-800 py-2 px-4 shadow-[0_-5px_10px_rgba(0,0,0,0.3)] z-50">
-        <p className="text-gray-500 text-xs font-mono font-medium tracking-wide text-center">
-          <span className="text-gray-400 font-bold ml-3">F1</span> Busca |
-          <span className="text-gray-400 font-bold ml-3">F2</span> Qtd |
-          <span className="text-gray-400 font-bold ml-3">F3</span> Desc |
-          <span className="text-gray-400 font-bold ml-3">F5</span> Pagar |
-          <span className="text-gray-400 font-bold ml-3">F8</span> Cancelar |
-          <span className="text-gray-400 font-bold ml-3">Del/F4</span> Remover |
-          <span className="text-gray-400 font-bold ml-3">↑↓</span> Navegar
+      <div className="absolute bottom-0 right-0 w-[40%] bg-[#060c18] border-t border-[#1B2A5E] py-2 px-4 shadow-[0_-5px_10px_rgba(0,0,0,0.4)] z-50">
+        <p className="text-slate-600 text-xs font-mono font-medium tracking-wide text-center">
+          <span className="text-[#C9A227] font-bold ml-3">F1</span> Busca |
+          <span className="text-[#C9A227] font-bold ml-3">F2</span> Qtd |
+          <span className="text-[#C9A227] font-bold ml-3">F3</span> Desc |
+          <span className="text-[#C9A227] font-bold ml-3">F5</span> Pagar |
+          <span className="text-[#C9A227] font-bold ml-3">F8</span> Cancelar |
+          <span className="text-[#C9A227] font-bold ml-3">Del/F4</span> Remover |
+          <span className="text-[#C9A227] font-bold ml-3">↑↓</span> Navegar
         </p>
       </div>
 

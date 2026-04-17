@@ -1,5 +1,23 @@
 {
   "permissions": {
-    "allow": ["Bash(grep -v \"^$\")"]
+    "allow": [
+      "Bash(grep -v \"^$\")",
+      "Read(//c/Users/chris/OneDrive/Documentos/Desenvolvedor/arquivos sismer/**)",
+      "Read(//c/Users/chris/Documents/Desenvolvedor/**)",
+      "Read(//c/Users/chris/OneDrive/Documentos/**)",
+      "Bash(mkdir -p \"apps/admin/public/logos\")",
+      "Bash(mkdir -p \"apps/pdv/public/logos\")",
+      "Bash(cp \"C:/Users/chris/OneDrive/Documentos/Desenvolvedor/arquivos sismer/OmniMarket-Logo.png\" \"apps/admin/public/logos/\")",
+      "Bash(cp \"C:/Users/chris/OneDrive/Documentos/Desenvolvedor/arquivos sismer/OmniMarket-Logo-Transparent.png\" \"apps/admin/public/logos/\")",
+      "Bash(cp \"C:/Users/chris/OneDrive/Documentos/Desenvolvedor/arquivos sismer/OmniMarket-Dark.png\" \"apps/admin/public/logos/\")",
+      "Bash(yarn dev *)",
+      "Bash(npx vite *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 5640)",
+      "Bash(awk '{print $5}')",
+      "Bash(xargs -r taskkill //F //PID)",
+      "Bash(npx eslint *)",
+      "Bash(npx prettier *)"
+    ]
   }
 }

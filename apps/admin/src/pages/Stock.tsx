@@ -202,11 +202,11 @@ export default function Stock() {
   ];
 
   return (
-    <div className="p-6 h-full flex flex-col gap-6">
+    <div className="space-y-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold dark:text-white">Controle de Estoque</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie produtos e movimentações</p>
+          <h1 className="text-xl font-bold text-[#1B2A5E]">Controle de Estoque</h1>
+          <p className="text-slate-500 text-sm mt-0.5">Gerencie produtos e movimentações</p>
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={() => setEntryModalOpen(true)}>Entrada de Mercadoria</Button>
@@ -216,25 +216,25 @@ export default function Stock() {
         </div>
       </div>
 
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
+      <div className="border-b border-slate-200">
+        <nav className="-mb-px flex space-x-6">
           <button
             onClick={() => setActiveTab('POSICAO')}
-            className={`${
+            className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition ${
               activeTab === 'POSICAO'
-                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition`}
+                ? 'border-[#C9A227] text-[#1B2A5E]'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            }`}
           >
             Posição Atual
           </button>
           <button
             onClick={() => setActiveTab('MOVIMENTACAO')}
-            className={`${
+            className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition ${
               activeTab === 'MOVIMENTACAO'
-                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition`}
+                ? 'border-[#C9A227] text-[#1B2A5E]'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            }`}
           >
             Movimentações
           </button>
@@ -243,7 +243,7 @@ export default function Stock() {
 
       {/* POSIÇÃO TAB */}
       {activeTab === 'POSICAO' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-700 p-6 flex flex-col gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4">
           <div className="flex gap-4">
             <Select
               label="Filtrar por Status"
@@ -274,7 +274,7 @@ export default function Stock() {
 
       {/* MOVIMENTAÇÕES TAB */}
       {activeTab === 'MOVIMENTACAO' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-700 p-6 flex flex-col gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4">
           <div className="flex flex-wrap items-end gap-4">
             <Select
               label="Produto"

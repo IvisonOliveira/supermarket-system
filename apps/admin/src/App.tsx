@@ -1,5 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
+import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Fiscal from './pages/Fiscal';
 import FiscalSettings from './pages/FiscalSettings';
@@ -11,9 +12,10 @@ import Stock from './pages/Stock';
 import Users from './pages/Users';
 import { useAuthStore } from './store/useAppStore';
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
-  useAuthStore((state) => state.isAuthenticated);
-  return children; // Força renderizar sem precisar da sessão : <Navigate to="/login" replace />;
+function PrivateRoute({ children, title }: { children: JSX.Element; title?: string }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <Layout title={title}>{children}</Layout>;
 }
 
 export default function App() {
@@ -23,7 +25,7 @@ export default function App() {
       <Route
         path="/"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Dashboard">
             <Dashboard />
           </PrivateRoute>
         }
@@ -31,7 +33,7 @@ export default function App() {
       <Route
         path="/users"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Usuários">
             <Users />
           </PrivateRoute>
         }
@@ -39,7 +41,7 @@ export default function App() {
       <Route
         path="/products"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Produtos">
             <Products />
           </PrivateRoute>
         }
@@ -47,7 +49,7 @@ export default function App() {
       <Route
         path="/products/new"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Novo Produto">
             <ProductForm />
           </PrivateRoute>
         }
@@ -55,7 +57,7 @@ export default function App() {
       <Route
         path="/products/:id/edit"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Editar Produto">
             <ProductForm />
           </PrivateRoute>
         }
@@ -63,7 +65,7 @@ export default function App() {
       <Route
         path="/fiscal"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Fiscal — Emissões">
             <Fiscal />
           </PrivateRoute>
         }
@@ -71,7 +73,7 @@ export default function App() {
       <Route
         path="/fiscal/settings"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Fiscal — Configurações">
             <FiscalSettings />
           </PrivateRoute>
         }
@@ -79,7 +81,7 @@ export default function App() {
       <Route
         path="/reports/abc"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Relatório Curva ABC">
             <ReportABC />
           </PrivateRoute>
         }
@@ -87,7 +89,7 @@ export default function App() {
       <Route
         path="/stock"
         element={
-          <PrivateRoute>
+          <PrivateRoute title="Controle de Estoque">
             <Stock />
           </PrivateRoute>
         }
