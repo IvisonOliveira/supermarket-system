@@ -247,7 +247,7 @@ export default function Dashboard() {
                       tickFormatter={(value) => `R$ ${value}`}
                     />
                     <RechartsTooltip
-                      formatter={(value: number) => [formatCurrency(value), 'Vendas']}
+                      formatter={(value: any) => [formatCurrency(value), 'Vendas']}
                       contentStyle={{
                         borderRadius: '8px',
                         border: 'none',
@@ -292,7 +292,7 @@ export default function Dashboard() {
                       width={100}
                     />
                     <RechartsTooltip
-                      formatter={(value: number) => [value, 'Quantidade']}
+                      formatter={(value: any) => [value, 'Quantidade']}
                       contentStyle={{
                         borderRadius: '8px',
                         border: 'none',

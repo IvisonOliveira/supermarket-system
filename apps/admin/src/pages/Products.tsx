@@ -160,8 +160,8 @@ export default function Products() {
       key: 'stock',
       label: 'Estoque',
       render: (p) => {
-        let variant: 'success' | 'danger' | 'secondary' | 'info' | 'warning' = 'success';
-        if (p.stock_qty === 0) variant = 'secondary';
+        let variant: 'success' | 'danger' | 'neutral' | 'info' | 'warning' = 'success';
+        if (p.stock_qty === 0) variant = 'neutral';
         else if (p.stock_qty <= p.stock_min) variant = 'danger';
         return (
           <Badge variant={variant}>
