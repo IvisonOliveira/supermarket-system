@@ -3,11 +3,44 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: #1B2A5E;
+    --color-gold: #C9A227;
+    --color-bg: #f8f9fc;
+    --color-surface: #ffffff;
+    --color-border: #e2e8f0;
+    --color-text: #1B2A5E;
+    --color-muted: #64748b;
+  }
+
   html {
     @apply antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-[#f8f9fc] text-[#1B2A5E];
+  }
+}
+
+@layer utilities {
+  .text-gold {
+    color: #C9A227;
+  }
+
+  .bg-navy {
+    background-color: #1B2A5E;
+  }
+
+  .bg-navy-dark {
+    background-color: #0f1932;
+  }
+
+  .border-gold {
+    border-color: #C9A227;
+  }
+
+  .gold-accent {
+    background: linear-gradient(135deg, #C9A227 0%, #e9be43 100%);
   }
 }

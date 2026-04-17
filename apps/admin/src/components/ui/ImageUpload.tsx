@@ -2,7 +2,7 @@ import imageCompression from 'browser-image-compression';
 import type React from 'react';
 import { useState, useRef } from 'react';
 
-import Button from './Button';
+import { Button } from './Button';
 
 interface ImageUploadProps {
   currentImageUrl?: string | null;

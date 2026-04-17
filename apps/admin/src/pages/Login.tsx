@@ -32,10 +32,7 @@ export default function Login() {
     setApiError(null);
     try {
       const response = await api.post('/auth/login', data);
-
-      // Extrai os dados baseado no formato esperado.
       const { user, token } = response.data;
-
       login(user, token);
       navigate('/');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,42 +44,83 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 shadow-xl rounded-2xl border border-gray-100 dark:border-gray-700">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Login</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Acesso restrito ao painel</p>
+    <div className="min-h-screen flex bg-[#f8f9fc]">
+      {/* Painel esquerdo — identidade visual */}
+      <div className="hidden lg:flex w-1/2 bg-[#1B2A5E] flex-col items-center justify-center p-12 relative overflow-hidden">
+        {/* Detalhe dourado no canto superior */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-[#C9A227] opacity-10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C9A227] opacity-5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <img
+            src="/logos/OmniMarket-Dark-Transparent.png"
+            alt="OmniMarket"
+            className="w-56 mb-10 drop-shadow-2xl"
+          />
+          <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+            Painel Administrativo
+          </h1>
+          <p className="text-[#C9A227] font-medium text-lg mb-2">Gestão inteligente do seu negócio</p>
+          <p className="text-blue-200 text-sm max-w-xs leading-relaxed">
+            Controle vendas, estoque, fiscal e relatórios em um único lugar.
+          </p>
+
+          {/* Divisor dourado */}
+          <div className="w-16 h-0.5 bg-[#C9A227] mt-8 rounded-full" />
+        </div>
+      </div>
+
+      {/* Painel direito — formulário */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        {/* Logo mobile (visível apenas em telas menores) */}
+        <div className="lg:hidden mb-8">
+          <img
+            src="/logos/OmniMarket-Logo-Transparent.png"
+            alt="OmniMarket"
+            className="w-40"
+          />
         </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            label="E-mail"
-            type="email"
-            placeholder="admin@empresa.com"
-            error={errors.email?.message}
-            disabled={isSubmitting}
-            {...register('email')}
-          />
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-[#1B2A5E]">Bem-vindo de volta</h2>
+            <p className="text-slate-500 mt-1 text-sm">Acesse sua conta para continuar</p>
+          </div>
 
-          <Input
-            label="Senha"
-            type="password"
-            placeholder="••••••••"
-            error={errors.password?.message}
-            disabled={isSubmitting}
-            {...register('password')}
-          />
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            <Input
+              label="E-mail"
+              type="email"
+              placeholder="admin@empresa.com"
+              error={errors.email?.message}
+              disabled={isSubmitting}
+              {...register('email')}
+            />
 
-          <Button type="submit" variant="primary" className="w-full mt-2" loading={isSubmitting}>
-            Entrar no Painel
-          </Button>
+            <Input
+              label="Senha"
+              type="password"
+              placeholder="••••••••"
+              error={errors.password?.message}
+              disabled={isSubmitting}
+              {...register('password')}
+            />
 
-          {apiError && (
-            <div className="p-3 mt-4 text-sm text-center text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400 rounded-lg">
-              {apiError}
-            </div>
-          )}
-        </form>
+            <Button type="submit" variant="primary" className="w-full mt-2" loading={isSubmitting}>
+              Entrar no Painel
+            </Button>
+
+            {apiError && (
+              <div className="p-3 mt-4 text-sm text-center text-red-700 bg-red-50 border border-red-200 rounded-lg">
+                {apiError}
+              </div>
+            )}
+          </form>
+
+          <p className="text-center text-xs text-slate-400 mt-8">
+            OmniMarket &copy; {new Date().getFullYear()} — Sistema de Gestão para Supermercados
+          </p>
+        </div>
       </div>
     </div>
   );
