@@ -1,5 +1,7 @@
-import { Injectable, Logger, ConflictException } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Injectable, Logger } from '@nestjs/common';
+// eslint-disable-next-line import/no-unresolved
+import { Cron } from '@nestjs/schedule';
+
 import { SupabaseConfig } from '../../../config/supabase.config';
 import { StockService } from '../stock.service';
 
