@@ -6,6 +6,8 @@ import FiscalSettings from './pages/FiscalSettings';
 import Login from './pages/Login';
 import ProductForm from './pages/ProductForm';
 import Products from './pages/Products';
+import ReportABC from './pages/ReportABC';
+import Stock from './pages/Stock';
 import Users from './pages/Users';
 import { useAuthStore } from './store/useAppStore';
 
@@ -71,6 +73,22 @@ export default function App() {
         element={
           <PrivateRoute>
             <FiscalSettings />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/reports/abc"
+        element={
+          <PrivateRoute>
+            <ReportABC />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/stock"
+        element={
+          <PrivateRoute>
+            <Stock />
           </PrivateRoute>
         }
       />

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
 import { Input, Select, Button, Spinner } from '../components/ui';
 import ImageUpload from '../components/ui/ImageUpload';
-import api from '../services/api';
+import { api } from '../services/api';
 
 const productSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
@@ -115,6 +116,7 @@ export default function ProductForm() {
   const onSubmit = async (data: ProductFormInputs) => {
     setLoading(true);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: any = {
       ...data,
       category_id: data.category_id || undefined,
@@ -143,6 +145,7 @@ export default function ProductForm() {
         }
       }
       navigate('/products');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erro ao salvar produto:', error);
       alert(error.response?.data?.message || 'Erro ao salvar o produto');
