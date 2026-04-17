@@ -1,4 +1,5 @@
 import { Injectable, ConflictException } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 
 @Injectable()
@@ -57,17 +58,22 @@ export class ReportsService {
     // Fazemos inner join filtrando vendas válidas no range que os itens residam
     const { data: items, error } = await this.supabase
       .from('sale_items')
-      .select(`
+      .select(
+        `
         product_id, name, qty, total,
         sales!inner(status, created_at)
-      `)
+      `,
+      )
       .neq('sales.status', 'cancelled')
       .gte('sales.created_at', range.start)
       .lte('sales.created_at', range.end);
 
     if (error) throw new ConflictException(`Falha ao recuperar itens das vendas: ${error.message}`);
 
-    const prodMap = new Map<string, { product_id: string; name: string; qty: number; revenue: number }>();
+    const prodMap = new Map<
+      string,
+      { product_id: string; name: string; qty: number; revenue: number }
+    >();
 
     for (const item of items || []) {
       const key = item.product_id;
@@ -89,7 +95,7 @@ export class ReportsService {
    */
   async curvaABC(start?: string, end?: string) {
     const baseRank = await this.produtosMaisVendidos(start, end, 999999);
-    
+
     // Passo 1: Receita total exaustiva global (100%)
     const globalTradedRevenue = baseRank.reduce((acc, p) => acc + p.revenue, 0);
 
@@ -108,7 +114,8 @@ export class ReportsService {
       let classification = 'C';
       if (cumulatedPercent <= 80.001) {
         classification = 'A';
-      } else if (cumulatedPercent <= 95.001) { // Acumulou proximo de + 30% da fatia em cima dos 20%
+      } else if (cumulatedPercent <= 95.001) {
+        // Acumulou proximo de + 30% da fatia em cima dos 20%
         classification = 'B';
       }
 
@@ -139,7 +146,7 @@ export class ReportsService {
       .lte('created_at', range.end);
 
     if (error) throw new ConflictException(`Erro de calculo em ticket médio: ${error.message}`);
-    
+
     const count = sales?.length || 0;
     if (count === 0) return { ticket_medio: 0, count: 0, revenue: 0 };
 
@@ -159,8 +166,8 @@ export class ReportsService {
   async resumoDiario(dateParam: string) {
     // Se mandou 2026-04-10, encapsula pro range inteiro do dia UTC
     const d = new Date(dateParam);
-    const startStr = new Date(d.setUTCHours(0,0,0,0)).toISOString();
-    const endStr = new Date(d.setUTCHours(23,59,59,999)).toISOString();
+    const startStr = new Date(d.setUTCHours(0, 0, 0, 0)).toISOString();
+    const endStr = new Date(d.setUTCHours(23, 59, 59, 999)).toISOString();
 
     const [ticket, topProducts, paymentDistributionData] = await Promise.all([
       this.ticketMedio(startStr, endStr),
@@ -170,25 +177,27 @@ export class ReportsService {
         .select('payment_method, total')
         .neq('status', 'cancelled')
         .gte('created_at', startStr)
-        .lte('created_at', endStr)
+        .lte('created_at', endStr),
     ]);
 
     // Calcular share das metodologias (Pix/Especie/Card)
     const payMap = new Map<string, { count: number; sum: number }>();
     if (paymentDistributionData.data && !paymentDistributionData.error) {
-       for (const sm of paymentDistributionData.data) {
-         const pm = sm.payment_method;
-         if (!payMap.has(pm)) payMap.set(pm, { count: 0, sum: 0});
-         payMap.get(pm)!.count += 1;
-         payMap.get(pm)!.sum += Number(sm.total);
-       }
+      for (const sm of paymentDistributionData.data) {
+        const pm = sm.payment_method;
+        if (!payMap.has(pm)) payMap.set(pm, { count: 0, sum: 0 });
+        payMap.get(pm)!.count += 1;
+        payMap.get(pm)!.sum += Number(sm.total);
+      }
     }
 
-    const payTypes = Array.from(payMap.entries()).map(([method, metrics]) => ({
-       method,
-       count: metrics.count,
-       total: Number(metrics.sum.toFixed(2))
-    })).sort((a,b) => b.total - a.total);
+    const payTypes = Array.from(payMap.entries())
+      .map(([method, metrics]) => ({
+        method,
+        count: metrics.count,
+        total: Number(metrics.sum.toFixed(2)),
+      }))
+      .sort((a, b) => b.total - a.total);
 
     return {
       date: startStr.split('T')[0],
