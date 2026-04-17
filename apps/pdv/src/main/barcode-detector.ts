@@ -1,4 +1,6 @@
-import { app, WebContents } from 'electron';
+import type { WebContents } from 'electron';
+import { app } from 'electron';
+
 import { IPC } from '../shared/ipc-channels';
 
 export function initBarcodeDetector() {

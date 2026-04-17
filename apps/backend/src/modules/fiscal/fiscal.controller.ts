@@ -69,7 +69,7 @@ export class FiscalController {
     if (!file || !password) throw new BadRequestException('Arquivo .pfx e senha são obrigatórios');
     if (!file.originalname.toLowerCase().endsWith('.pfx'))
       throw new BadRequestException('Formato de certificado deve ser apenas .pfx');
-    return this.certificateService.upload(file.buffer as Buffer, password);
+    return this.certificateService.upload(file.buffer, password);
   }
 
   @Get('certificate/status')

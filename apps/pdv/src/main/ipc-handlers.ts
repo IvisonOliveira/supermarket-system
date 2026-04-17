@@ -1,6 +1,9 @@
 import type { IpcMain } from 'electron';
+import { SerialPort } from 'serialport';
 
 import { IPC } from '../shared/ipc-channels';
+
+import { initBarcodeDetector } from './barcode-detector';
 import {
   getProducts,
   searchProducts,
@@ -9,9 +12,7 @@ import {
   getPendingSales,
   markSaleSynced,
 } from './database';
-import { initBarcodeDetector } from './barcode-detector';
 import { scaleReader } from './scale-reader';
-import { SerialPort } from 'serialport';
 
 /**
  * Registra todos os handlers IPC do processo main.

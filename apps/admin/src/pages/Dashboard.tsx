@@ -11,6 +11,7 @@ import {
   Bar,
 } from 'recharts';
 
+import logoNegative from '../assets/OmniMarket-Negative-Transparent.png';
 import { Badge } from '../components/ui/Badge';
 import { Card } from '../components/ui/Card';
 import { Spinner } from '../components/ui/Spinner';
@@ -316,7 +317,7 @@ export default function Dashboard() {
       {isMenuOpen && (
         <aside className="w-64 bg-primary-600 text-white flex flex-col p-6 shadow-xl">
           <div className="mb-8 flex flex-col items-center">
-            <img src="/logo.png" alt="OmniMarket" className="max-w-[140px]" />
+            <img src={logoNegative} alt="OmniMarket" className="max-w-[140px]" />
             <span className="text-sm mt-2 font-semibold">OmniMarket</span>
           </div>
           <nav className="flex-1 space-y-2">

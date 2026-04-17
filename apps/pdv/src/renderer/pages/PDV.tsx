@@ -1,5 +1,8 @@
-import { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 import type { Product } from '../../shared/ipc-channels';
+import logoUrl from '../assets/OmniMarket-Dark-Transparent.png';
 import PaymentModal from '../components/PaymentModal';
 
 export interface SaleItem extends Product {
@@ -222,7 +225,7 @@ export default function PDV() {
               <div
                 id={`item-${index}`}
                 key={`${item.id}-${index}`}
-                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex ? 'bg-gray-800 border-green-500 ring-2 ring-green-500/50' : 'bg-gray-700 border-gray-600'}`}
+                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex ? 'bg-gray-800 border-brand-accent ring-2 ring-brand-accent/30' : 'bg-gray-700 border-gray-600'}`}
               >
                 <div className="flex-1 pr-4">
                   <span className="text-white block text-2xl font-bold truncate">{item.name}</span>
@@ -318,7 +321,7 @@ export default function PDV() {
             </div>
             <div className="text-right">
               <p className="text-3xl text-gray-400 mb-2 font-medium tracking-wide">TOTAL GERAL</p>
-              <p className="text-7xl font-black text-brand-primary tracking-tighter">
+              <p className="text-7xl font-black text-brand-accent tracking-tighter drop-shadow-md">
                 R$ {calculateTotal().toFixed(2)}
               </p>
             </div>
@@ -333,7 +336,7 @@ export default function PDV() {
             <button
               disabled={items.length === 0}
               onClick={() => setIsPaymentOpen(true)}
-              className="flex-[3] bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-4xl font-black py-6 rounded-lg transition-colors shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98]"
+              className="flex-[3] bg-brand-secondary hover:bg-brand-accent disabled:opacity-50 disabled:cursor-not-allowed text-white text-4xl font-black py-6 rounded-lg transition-all shadow-[0_0_20px_rgba(205,160,63,0.3)] hover:shadow-[0_0_25px_rgba(232,183,79,0.5)] active:scale-[0.98]"
             >
               FINALIZAR VENDA
             </button>
@@ -343,18 +346,22 @@ export default function PDV() {
 
       {/* PAINEL DIREITO: BUSCA E ATALHOS (40%) */}
       <div className="w-[40%] flex flex-col p-8 bg-gray-900 border-l border-black/50 shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10 relative">
-        <div className="flex items-center gap-4 mb-8">
-          <img src="/logo.png" alt="OmniMarket" className="max-h-[40px]" />
-          <input
-            ref={searchInputRef}
-            autoFocus
-            className="w-full bg-gray-800 border-2 border-gray-700 text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all placeholder-gray-600"
-            placeholder="CÓDIGO DE BARRAS"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
+        <div className="flex justify-center mb-10 mt-2">
+          <img
+            src={logoUrl}
+            alt="OmniMarket"
+            className="h-28 drop-shadow-[0_0_15px_rgba(232,183,79,0.15)]"
           />
         </div>
+        <input
+          ref={searchInputRef}
+          autoFocus
+          className="w-full bg-gray-800 border-2 border-gray-700 text-white text-4xl font-mono p-6 rounded-lg shadow-inner outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/40 transition-all placeholder-gray-600 mb-8"
+          placeholder="CÓDIGO DE BARRAS"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
 
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           {searchQuery.trim() ? (
@@ -380,7 +387,7 @@ export default function PDV() {
                       </div>
                       <div className="text-base font-mono text-gray-400 mt-2">{p.barcode}</div>
                     </div>
-                    <div className="text-2xl font-black text-green-400 group-hover:text-green-300">
+                    <div className="text-2xl font-black text-brand-accent group-hover:text-brand-secondary">
                       R$ {p.price.toFixed(2)}
                     </div>
                   </button>
@@ -403,7 +410,7 @@ export default function PDV() {
                     <span className="text-center w-full mb-3 text-xl font-semibold text-gray-300 group-hover:text-white line-clamp-3 leading-snug">
                       {p.name}
                     </span>
-                    <span className="text-green-400 text-3xl font-black mt-auto">
+                    <span className="text-brand-accent text-3xl font-black mt-auto drop-shadow-sm">
                       R$ {p.price.toFixed(2)}
                     </span>
                   </button>

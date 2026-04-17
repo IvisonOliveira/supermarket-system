@@ -1,5 +1,5 @@
-import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
+import { SerialPort } from 'serialport';
 
 export class ScaleReader {
   private port: SerialPort | null = null;

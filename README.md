@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/logo.png" width="200"/>
+  <img src="assets/brand/OmniMarket-Logo-Transparent.png" width="200"/>
 </p>
 
 # OmniMarket — Sistema de Gestão para Supermercados

@@ -218,7 +218,7 @@ export default function FiscalSettings() {
                     type="password"
                     label="Senha do Certificado"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e: any) => setPassword(e.target.value)}
                     required
                     placeholder="Sua senha..."
                   />

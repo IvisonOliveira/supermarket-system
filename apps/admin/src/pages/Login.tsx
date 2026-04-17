@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import logoDark from '../assets/OmniMarket-Dark-Transparent.png';
 import { Input, Button } from '../components/ui';
 import { api } from '../services/api';
 import { useAuthStore } from '../store/useAppStore';
@@ -50,7 +51,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-brand-primary transition-colors p-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 shadow-xl rounded-2xl border border-gray-100 dark:border-gray-700">
         <div className="text-center mb-8 flex flex-col items-center">
-          <img src="/logo.png" alt="OmniMarket" className="max-w-[120px] mb-4" />
+          <img src={logoDark} alt="OmniMarket" className="max-w-[120px] mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">OmniMarket Login</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Acesso restrito ao painel</p>
         </div>
