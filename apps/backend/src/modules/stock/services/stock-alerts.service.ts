@@ -1,5 +1,6 @@
-import { Injectable, Logger, ConflictException } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+
 import { SupabaseConfig } from '../../../config/supabase.config';
 import { StockService } from '../stock.service';
 
