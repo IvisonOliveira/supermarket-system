@@ -1,4 +1,5 @@
 import type { SelectHTMLAttributes } from 'react';
+import { forwardRef } from 'react';
 
 export interface Option {
   value: string | number;

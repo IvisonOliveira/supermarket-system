@@ -61,6 +61,7 @@ export default function Products() {
   const loadProducts = async () => {
     try {
       setLoading(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const params: any = {
         page: filters.page,
         limit: filters.limit,
@@ -89,6 +90,7 @@ export default function Products() {
 
   useEffect(() => {
     loadProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,8 +160,8 @@ export default function Products() {
       key: 'stock',
       label: 'Estoque',
       render: (p) => {
-        let variant: 'success' | 'danger' | 'secondary' | 'info' | 'warning' = 'success';
-        if (p.stock_qty === 0) variant = 'secondary';
+        let variant: 'success' | 'danger' | 'neutral' | 'info' | 'warning' = 'success';
+        if (p.stock_qty === 0) variant = 'neutral';
         else if (p.stock_qty <= p.stock_min) variant = 'danger';
         return (
           <Badge variant={variant}>

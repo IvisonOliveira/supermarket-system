@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, FormEvent } from 'react';
+import type { FormEvent } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { api } from '../services/api';
 import { Button, Modal, Input, Select, Badge, Table, Spinner } from '../components/ui';
 import type { Column } from '../components/ui';
+import { api } from '../services/api';
 
 interface Product {
   id: string;
@@ -184,10 +185,10 @@ export default function Stock() {
   ];
 
   const movColumns: Column<Movement>[] = [
-    { 
-      key: 'data', 
+    {
+      key: 'data',
       label: 'Data',
-      render: (item) => new Date(item.data).toLocaleString('pt-BR')
+      render: (item) => new Date(item.data).toLocaleString('pt-BR'),
     },
     { key: 'produto', label: 'Produto' },
     {
@@ -209,7 +210,9 @@ export default function Stock() {
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={() => setEntryModalOpen(true)}>Entrada de Mercadoria</Button>
-          <Button variant="secondary" onClick={() => setAdjModalOpen(true)}>Ajuste Manual</Button>
+          <Button variant="secondary" onClick={() => setAdjModalOpen(true)}>
+            Ajuste Manual
+          </Button>
         </div>
       </div>
 
@@ -256,9 +259,15 @@ export default function Stock() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center p-8"><Spinner /></div>
+            <div className="flex justify-center p-8">
+              <Spinner />
+            </div>
           ) : (
-            <Table columns={posColumns} data={filteredPositions} emptyMessage="Nenhum produto encontrado no estoque." />
+            <Table
+              columns={posColumns}
+              data={filteredPositions}
+              emptyMessage="Nenhum produto encontrado no estoque."
+            />
           )}
         </div>
       )}
@@ -300,15 +309,25 @@ export default function Stock() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center p-8"><Spinner /></div>
+            <div className="flex justify-center p-8">
+              <Spinner />
+            </div>
           ) : (
-            <Table columns={movColumns} data={movements} emptyMessage="Nenhuma movimentação no período." />
+            <Table
+              columns={movColumns}
+              data={movements}
+              emptyMessage="Nenhuma movimentação no período."
+            />
           )}
         </div>
       )}
 
       {/* MODAL ENTRADA DE MERCADORIA */}
-      <Modal isOpen={isEntryModalOpen} onClose={() => setEntryModalOpen(false)} title="Nova Entrada de Mercadoria">
+      <Modal
+        isOpen={isEntryModalOpen}
+        onClose={() => setEntryModalOpen(false)}
+        title="Nova Entrada de Mercadoria"
+      >
         <form onSubmit={submitEntry} className="space-y-4">
           <Select
             label="Produto"
@@ -336,14 +355,20 @@ export default function Stock() {
             onChange={(e) => setEntryForm({ ...entryForm, obs: e.target.value })}
           />
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="secondary" onClick={() => setEntryModalOpen(false)}>Cancelar</Button>
+            <Button type="button" variant="secondary" onClick={() => setEntryModalOpen(false)}>
+              Cancelar
+            </Button>
             <Button type="submit">Registrar Entrada</Button>
           </div>
         </form>
       </Modal>
 
       {/* MODAL AJUSTE MANUAL */}
-      <Modal isOpen={isAdjModalOpen} onClose={() => setAdjModalOpen(false)} title="Ajuste Manual de Estoque">
+      <Modal
+        isOpen={isAdjModalOpen}
+        onClose={() => setAdjModalOpen(false)}
+        title="Ajuste Manual de Estoque"
+      >
         <form onSubmit={submitAdj} className="space-y-4">
           <Select
             label="Produto"
@@ -368,7 +393,9 @@ export default function Stock() {
             placeholder="Obrigatório para auditoria"
           />
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="secondary" onClick={() => setAdjModalOpen(false)}>Cancelar</Button>
+            <Button type="button" variant="secondary" onClick={() => setAdjModalOpen(false)}>
+              Cancelar
+            </Button>
             <Button type="submit">Registrar Ajuste</Button>
           </div>
         </form>
