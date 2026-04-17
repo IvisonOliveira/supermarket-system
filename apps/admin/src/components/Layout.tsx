@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+
 import { useAuthStore } from '../store/useAppStore';
 
 interface NavItem {
@@ -206,6 +207,7 @@ export default function Layout({ children, title }: LayoutProps) {
     <div className="flex h-screen bg-[#f0f2f8] overflow-hidden">
       {/* Overlay mobile */}
       {sidebarOpen && !isDesktop && (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
           className="fixed inset-0 bg-black/50 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
