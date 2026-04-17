@@ -1,5 +1,5 @@
-import { IsUUID, IsNumber, Min, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsUUID, IsNumber, Min, IsOptional, IsString } from 'class-validator';
 
 export class CreateEntryDto {
   @ApiProperty({ description: 'ID do produto no catálogo' })

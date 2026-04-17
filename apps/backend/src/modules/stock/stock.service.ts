@@ -1,8 +1,15 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 
-import { CreateEntryDto } from './dto/create-entry.dto';
 import { CreateAdjustmentDto } from './dto/create-adjustment.dto';
+import { CreateEntryDto } from './dto/create-entry.dto';
 
 interface FindMovementsOptions {
   productId?: string;
@@ -50,8 +57,10 @@ export class StockService {
         qty: dto.qty,
         qty_before: qtyBefore,
         qty_after: qtyAfter,
-        reason: dto.nf_number ? `NF: ${dto.nf_number} | ${dto.note || ''}` : dto.note || 'Entrada manual',
-        operator_id: operatorId
+        reason: dto.nf_number
+          ? `NF: ${dto.nf_number} | ${dto.note || ''}`
+          : dto.note || 'Entrada manual',
+        operator_id: operatorId,
       })
       .select('*')
       .single();
@@ -60,7 +69,9 @@ export class StockService {
       throw new ConflictException(`Erro ao registrar entrada de estoque: ${error.message}`);
     }
 
-    this.logger.log(`[STOCK] Entrada registrada: Produto ${dto.product_id} | Qty: ${dto.qty} | NF: ${dto.nf_number || 'Sem NF'}`);
+    this.logger.log(
+      `[STOCK] Entrada registrada: Produto ${dto.product_id} | Qty: ${dto.qty} | NF: ${dto.nf_number || 'Sem NF'}`,
+    );
     return movement;
   }
 
@@ -88,7 +99,9 @@ export class StockService {
     const absoluteQty = Math.abs(dto.qty);
 
     if (qtyAfter < 0) {
-      throw new ConflictException(`O ajuste resulta em estoque negativo (${qtyAfter}). Operação bloqueada.`);
+      throw new ConflictException(
+        `O ajuste resulta em estoque negativo (${qtyAfter}). Operação bloqueada.`,
+      );
     }
 
     const { data: movement, error } = await this.supabase
@@ -100,7 +113,7 @@ export class StockService {
         qty_before: qtyBefore,
         qty_after: qtyAfter,
         reason: dto.note,
-        operator_id: operatorId
+        operator_id: operatorId,
       })
       .select('*')
       .single();
@@ -109,7 +122,9 @@ export class StockService {
       throw new ConflictException(`Erro ao registrar ajuste de estoque: ${error.message}`);
     }
 
-    this.logger.log(`[STOCK] Ajuste registrado: Produto ${dto.product_id} | Válido: ${dto.qty} | Razão: ${dto.note}`);
+    this.logger.log(
+      `[STOCK] Ajuste registrado: Produto ${dto.product_id} | Válido: ${dto.qty} | Razão: ${dto.note}`,
+    );
     return movement;
   }
 
@@ -128,7 +143,7 @@ export class StockService {
         .select('id, stock_qty')
         .eq('id', item.productId)
         .single();
-        
+
       if (!product) continue; // Ignora se o produto não existir
 
       const qtyBefore = Number(product.stock_qty);
@@ -136,23 +151,21 @@ export class StockService {
 
       if (qtyAfter < 0) {
         this.logger.warn(
-          `[STOCK] Estoque insuficiente para produto ${item.productId}. Movimentação ignorada.`
+          `[STOCK] Estoque insuficiente para produto ${item.productId}. Movimentação ignorada.`,
         );
         continue;
       }
 
-      await this.supabase
-        .from('stock_movements')
-        .insert({
-          product_id: item.productId,
-          type: 'venda',
-          qty: item.qty, // Sempre positivo conforme Constraint
-          qty_before: qtyBefore,
-          qty_after: qtyAfter,
-          sale_id: saleId,
-          operator_id: operatorId,
-          reason: `Venda via PDV: ${saleId}`
-        });
+      await this.supabase.from('stock_movements').insert({
+        product_id: item.productId,
+        type: 'venda',
+        qty: item.qty, // Sempre positivo conforme Constraint
+        qty_before: qtyBefore,
+        qty_after: qtyAfter,
+        sale_id: saleId,
+        operator_id: operatorId,
+        reason: `Venda via PDV: ${saleId}`,
+      });
     }
 
     this.logger.log(`[STOCK] Baixa de estoque registrada para a venda ${saleId}`);
@@ -161,11 +174,13 @@ export class StockService {
   async findMovements(options: FindMovementsOptions) {
     let query = this.supabase
       .from('stock_movements')
-      .select(`
+      .select(
+        `
         *,
         product:products (id, name, sku, barcode),
         operator:users (id, name)
-      `)
+      `,
+      )
       .order('created_at', { ascending: false });
 
     if (options.productId) {
@@ -209,18 +224,17 @@ export class StockService {
       .single();
 
     if (error) {
-       throw new ConflictException(`Erro ao reconhecer o alerta: ${error.message}`);
+      throw new ConflictException(`Erro ao reconhecer o alerta: ${error.message}`);
     }
     if (!alert) {
-       throw new NotFoundException(`Alerta não encontrado para atualização.`);
+      throw new NotFoundException(`Alerta não encontrado para atualização.`);
     }
 
     return { message: 'Alerta marcado como lido.', alert };
   }
 
   async findLowStock() {
-    const { data, error } = await this.supabase
-      .rpc('get_low_stock_products');
+    const { data, error } = await this.supabase.rpc('get_low_stock_products');
 
     if (error) {
       throw new ConflictException(`Erro ao buscar estoque baixo: ${error.message}`);
@@ -249,7 +263,7 @@ export class StockService {
 
     return {
       product,
-      recentMovements: movements || []
+      recentMovements: movements || [],
     };
   }
 }

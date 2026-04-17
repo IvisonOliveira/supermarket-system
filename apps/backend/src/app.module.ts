@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -9,6 +10,9 @@ import { FiscalModule } from './modules/fiscal/fiscal.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { StockModule } from './modules/stock/stock.module';
+import { UsersModule } from './modules/users/users.module';
+import { CashierModule } from './modules/cashier/cashier.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -16,6 +20,7 @@ import { StockModule } from './modules/stock/stock.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     AppConfigModule, // SupabaseConfig disponível globalmente
     AuthModule,
     UsersModule,
@@ -24,7 +29,7 @@ import { StockModule } from './modules/stock/stock.module';
     SalesModule,
     CashierModule,
     FiscalModule,
-    // ReportsModule — próximas fases
+    ReportsModule,
   ],
   providers: [
     {
