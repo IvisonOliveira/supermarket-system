@@ -392,7 +392,9 @@ export default function PDV() {
             <div>
               <h3 className="text-slate-500 mb-5 font-bold tracking-widest text-sm uppercase flex items-center justify-between">
                 <span>Atalhos Rápidos</span>
-                <span className="text-xs bg-[#0f1932] border border-[#1B2A5E] px-2 py-1 rounded text-slate-400">Top 12</span>
+                <span className="text-xs bg-[#0f1932] border border-[#1B2A5E] px-2 py-1 rounded text-slate-400">
+                  Top 12
+                </span>
               </h3>
               <div className="grid grid-cols-2 2xl:grid-cols-3 gap-4">
                 {searchResults.slice(0, 12).map((p) => (

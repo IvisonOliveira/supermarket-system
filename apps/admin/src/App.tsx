@@ -22,15 +22,78 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<PrivateRoute title="Dashboard"><Dashboard /></PrivateRoute>} />
-      <Route path="/users" element={<PrivateRoute title="Usuários"><Users /></PrivateRoute>} />
-      <Route path="/products" element={<PrivateRoute title="Produtos"><Products /></PrivateRoute>} />
-      <Route path="/products/new" element={<PrivateRoute title="Novo Produto"><ProductForm /></PrivateRoute>} />
-      <Route path="/products/:id/edit" element={<PrivateRoute title="Editar Produto"><ProductForm /></PrivateRoute>} />
-      <Route path="/fiscal" element={<PrivateRoute title="Fiscal — Emissões"><Fiscal /></PrivateRoute>} />
-      <Route path="/fiscal/settings" element={<PrivateRoute title="Fiscal — Configurações"><FiscalSettings /></PrivateRoute>} />
-      <Route path="/reports/abc" element={<PrivateRoute title="Relatório Curva ABC"><ReportABC /></PrivateRoute>} />
-      <Route path="/stock" element={<PrivateRoute title="Controle de Estoque"><Stock /></PrivateRoute>} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute title="Dashboard">
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <PrivateRoute title="Usuários">
+            <Users />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <PrivateRoute title="Produtos">
+            <Products />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/products/new"
+        element={
+          <PrivateRoute title="Novo Produto">
+            <ProductForm />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/products/:id/edit"
+        element={
+          <PrivateRoute title="Editar Produto">
+            <ProductForm />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/fiscal"
+        element={
+          <PrivateRoute title="Fiscal — Emissões">
+            <Fiscal />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/fiscal/settings"
+        element={
+          <PrivateRoute title="Fiscal — Configurações">
+            <FiscalSettings />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/reports/abc"
+        element={
+          <PrivateRoute title="Relatório Curva ABC">
+            <ReportABC />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/stock"
+        element={
+          <PrivateRoute title="Controle de Estoque">
+            <Stock />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 }

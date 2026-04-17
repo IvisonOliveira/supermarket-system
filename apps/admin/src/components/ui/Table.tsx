@@ -38,7 +38,10 @@ export function Table<T>({
         <tbody className="divide-y divide-slate-100 bg-white">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-5 py-10 text-center text-sm text-slate-400">
+              <td
+                colSpan={columns.length}
+                className="px-5 py-10 text-center text-sm text-slate-400"
+              >
                 {emptyMessage}
               </td>
             </tr>
@@ -46,7 +49,10 @@ export function Table<T>({
             data.map((item, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-slate-50/70 transition-colors">
                 {columns.map((col, colIndex) => (
-                  <td key={String(col.key) + colIndex} className="px-5 py-3.5 whitespace-nowrap text-slate-700">
+                  <td
+                    key={String(col.key) + colIndex}
+                    className="px-5 py-3.5 whitespace-nowrap text-slate-700"
+                  >
                     {col.render ? col.render(item) : String(item[col.key as keyof T] ?? '')}
                   </td>
                 ))}

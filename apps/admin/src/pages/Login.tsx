@@ -60,7 +60,9 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
             Painel Administrativo
           </h1>
-          <p className="text-[#C9A227] font-medium text-lg mb-2">Gestão inteligente do seu negócio</p>
+          <p className="text-[#C9A227] font-medium text-lg mb-2">
+            Gestão inteligente do seu negócio
+          </p>
           <p className="text-blue-200 text-sm max-w-xs leading-relaxed">
             Controle vendas, estoque, fiscal e relatórios em um único lugar.
           </p>
@@ -74,11 +76,7 @@ export default function Login() {
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         {/* Logo mobile (visível apenas em telas menores) */}
         <div className="lg:hidden mb-8">
-          <img
-            src="/logos/OmniMarket-Logo-Transparent.png"
-            alt="OmniMarket"
-            className="w-40"
-          />
+          <img src="/logos/OmniMarket-Logo-Transparent.png" alt="OmniMarket" className="w-40" />
         </div>
 
         <div className="w-full max-w-md">
