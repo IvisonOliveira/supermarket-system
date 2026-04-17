@@ -37,7 +37,7 @@ export class ReportsService {
     const groupedMap = new Map<string, { date: string; revenue: number; count: number }>();
 
     for (const sale of sales || []) {
-      const dateKey = new Date(sale.created_at).toISOString().split('T')[0];
+      const dateKey = new Date(String(sale.created_at)).toISOString().split('T')[0];
       if (!groupedMap.has(dateKey)) {
         groupedMap.set(dateKey, { date: dateKey, revenue: 0, count: 0 });
       }
@@ -76,9 +76,9 @@ export class ReportsService {
     >();
 
     for (const item of items || []) {
-      const key = item.product_id;
+      const key = String(item.product_id);
       if (!prodMap.has(key)) {
-        prodMap.set(key, { product_id: key, name: item.name, qty: 0, revenue: 0 });
+        prodMap.set(key, { product_id: key, name: String(item.name), qty: 0, revenue: 0 });
       }
       const agg = prodMap.get(key)!;
       // Note que sale_items guarda no "total" o valor real cobrado daquele bundle (qty * (unit - discount))
@@ -184,7 +184,7 @@ export class ReportsService {
     const payMap = new Map<string, { count: number; sum: number }>();
     if (paymentDistributionData.data && !paymentDistributionData.error) {
       for (const sm of paymentDistributionData.data) {
-        const pm = sm.payment_method;
+        const pm = String(sm.payment_method);
         if (!payMap.has(pm)) payMap.set(pm, { count: 0, sum: 0 });
         payMap.get(pm)!.count += 1;
         payMap.get(pm)!.sum += Number(sm.total);

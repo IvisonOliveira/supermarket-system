@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
+// eslint-disable-next-line import/no-unresolved
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { AppConfigModule } from './config/config.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { AppConfigModule } from './config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CashierModule } from './modules/cashier/cashier.module';
 import { FiscalModule } from './modules/fiscal/fiscal.module';
