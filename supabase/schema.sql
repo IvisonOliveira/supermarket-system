@@ -353,6 +353,33 @@ CREATE TRIGGER trg_certificate_config_updated_at
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- =============================================================================
+-- TABELA: stock_alerts
+-- Avisos automáticos do CRON para perigo de produtos zerando.
+-- =============================================================================
+CREATE TABLE stock_alerts (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id     UUID        NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  current_qty    NUMERIC(10,3) NOT NULL,
+  min_qty        NUMERIC(10,3) NOT NULL,
+  acknowledged   BOOLEAN     NOT NULL DEFAULT FALSE,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE stock_alerts IS 'Alertas pendentes gerados automaticamente às 8h';
+
+ALTER TABLE stock_alerts ENABLE ROW LEVEL SECURITY;
+
+CREATE TRIGGER trg_stock_alerts_updated_at
+  BEFORE UPDATE ON stock_alerts
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE POLICY "Autenticados gerenciam alertas pendentes"
+  ON stock_alerts FOR ALL
+  USING (auth.role() = 'authenticated');
+
+-- =============================================================================
 -- FIM DO SCHEMA
 -- Para aplicar: supabase db push  (local)  ou  cole no SQL Editor do Supabase
 -- =============================================================================
+

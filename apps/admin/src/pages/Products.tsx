@@ -160,8 +160,8 @@ export default function Products() {
       key: 'stock',
       label: 'Estoque',
       render: (p) => {
-        let variant: 'success' | 'danger' | 'secondary' | 'info' | 'warning' = 'success';
-        if (p.stock_qty === 0) variant = 'secondary';
+        let variant: 'success' | 'danger' | 'neutral' | 'info' | 'warning' = 'success';
+        if (p.stock_qty === 0) variant = 'neutral';
         else if (p.stock_qty <= p.stock_min) variant = 'danger';
         return (
           <Badge variant={variant}>
@@ -193,13 +193,13 @@ export default function Products() {
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold dark:text-white">Produtos</h1>
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-xl font-bold text-[#1B2A5E]">Produtos</h1>
         <Button onClick={() => navigate('/products/new')}>Novo Produto</Button>
       </div>
 
-      <div className="flex gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded shadow-sm items-end flex-wrap">
+      <div className="flex gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm items-end flex-wrap">
         <div className="flex-1 min-w-[200px]">
           <Input
             label="Buscar"
@@ -242,7 +242,7 @@ export default function Products() {
           <Table columns={columns} data={products} emptyMessage="Nenhum produto encontrado" />
 
           <div className="flex justify-between items-center mt-4">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-slate-500">
               Página {meta.page} de {meta.totalPages || 1} ({meta.total} itens)
             </span>
             <div className="flex gap-2">
