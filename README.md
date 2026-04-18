@@ -1,4 +1,8 @@
-# Supermarket System
+<p align="center">
+  <img src="assets/brand/OmniMarket-Logo-Transparent.png" width="200"/>
+</p>
+
+# OmniMarket — Sistema de Gestão para Supermercados
 
 Sistema completo de gestão para supermercados com PDV offline-first, painel administrativo web e app mobile.
 

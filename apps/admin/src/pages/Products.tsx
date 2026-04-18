@@ -181,7 +181,7 @@ export default function Products() {
       label: 'Ações',
       render: (p) => (
         <div className="flex gap-2 justify-end w-full">
-          <Button size="sm" variant="secondary" onClick={() => navigate(`/products/${p.id}/edit`)}>
+          <Button size="sm" variant="neutral" onClick={() => navigate(`/products/${p.id}/edit`)}>
             Editar
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDelete(p.id)}>
@@ -250,7 +250,7 @@ export default function Products() {
                 Anterior
               </Button>
               <Button
-                variant="secondary"
+                variant="neutral"
                 disabled={meta.page >= meta.totalPages || meta.totalPages === 0}
                 onClick={handleNextPage}
               >

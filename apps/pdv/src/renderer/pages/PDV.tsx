@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 import type { Product } from '../../shared/ipc-channels';
 import PaymentModal from '../components/PaymentModal';
 

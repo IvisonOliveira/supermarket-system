@@ -172,14 +172,14 @@ export default function Users() {
             label="Nome"
             required
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
           />
           <Input
             label="Email"
             type="email"
             required
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e: any) => setFormData({ ...formData, email: e.target.value })}
           />
           {!editingUser && (
             <Input
@@ -187,7 +187,7 @@ export default function Users() {
               type="password"
               required
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e: any) => setFormData({ ...formData, password: e.target.value })}
             />
           )}
           <Select
@@ -195,7 +195,7 @@ export default function Users() {
             options={roleOptions}
             required
             value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            onChange={(e: any) => setFormData({ ...formData, role: e.target.value })}
           />
 
           <div className="flex justify-end gap-2 pt-4">

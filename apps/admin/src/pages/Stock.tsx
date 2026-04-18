@@ -254,7 +254,7 @@ export default function Stock() {
                 { value: 'ZERADO', label: 'Zerado' },
               ]}
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e: any) => setStatusFilter(e.target.value)}
             />
           </div>
 
@@ -280,7 +280,7 @@ export default function Stock() {
               label="Produto"
               options={prodOptions}
               value={movProductFilter}
-              onChange={(e) => setMovProductFilter(e.target.value)}
+              onChange={(e: any) => setMovProductFilter(e.target.value)}
             />
             <Select
               label="Tipo de Movimentação"
@@ -292,19 +292,19 @@ export default function Stock() {
                 { value: 'VENDA', label: 'Venda' },
               ]}
               value={movTypeFilter}
-              onChange={(e) => setMovTypeFilter(e.target.value)}
+              onChange={(e: any) => setMovTypeFilter(e.target.value)}
             />
             <Input
               label="Início"
               type="date"
               value={movStartDate}
-              onChange={(e) => setMovStartDate(e.target.value)}
+              onChange={(e: any) => setMovStartDate(e.target.value)}
             />
             <Input
               label="Fim"
               type="date"
               value={movEndDate}
-              onChange={(e) => setMovEndDate(e.target.value)}
+              onChange={(e: any) => setMovEndDate(e.target.value)}
             />
           </div>
 
@@ -334,7 +334,7 @@ export default function Stock() {
             required
             options={prodOptions}
             value={entryForm.productId}
-            onChange={(e) => setEntryForm({ ...entryForm, productId: e.target.value })}
+            onChange={(e: any) => setEntryForm({ ...entryForm, productId: e.target.value })}
           />
           <Input
             label="Quantidade"
@@ -342,17 +342,17 @@ export default function Stock() {
             min="1"
             required
             value={entryForm.quantity}
-            onChange={(e) => setEntryForm({ ...entryForm, quantity: e.target.value })}
+            onChange={(e: any) => setEntryForm({ ...entryForm, quantity: e.target.value })}
           />
           <Input
             label="Número da NF de Compra (Opcional)"
             value={entryForm.nf}
-            onChange={(e) => setEntryForm({ ...entryForm, nf: e.target.value })}
+            onChange={(e: any) => setEntryForm({ ...entryForm, nf: e.target.value })}
           />
           <Input
             label="Observação (Opcional)"
             value={entryForm.obs}
-            onChange={(e) => setEntryForm({ ...entryForm, obs: e.target.value })}
+            onChange={(e: any) => setEntryForm({ ...entryForm, obs: e.target.value })}
           />
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="secondary" onClick={() => setEntryModalOpen(false)}>
@@ -375,21 +375,21 @@ export default function Stock() {
             required
             options={prodOptions}
             value={adjForm.productId}
-            onChange={(e) => setAdjForm({ ...adjForm, productId: e.target.value })}
+            onChange={(e: any) => setAdjForm({ ...adjForm, productId: e.target.value })}
           />
           <Input
             label="Quantidade"
             type="number"
             required
             value={adjForm.quantity}
-            onChange={(e) => setAdjForm({ ...adjForm, quantity: e.target.value })}
+            onChange={(e: any) => setAdjForm({ ...adjForm, quantity: e.target.value })}
             placeholder="Ex: -10 para saída, 5 para entrada"
           />
           <Input
             label="Justificativa"
             required
             value={adjForm.justification}
-            onChange={(e) => setAdjForm({ ...adjForm, justification: e.target.value })}
+            onChange={(e: any) => setAdjForm({ ...adjForm, justification: e.target.value })}
             placeholder="Obrigatório para auditoria"
           />
           <div className="flex justify-end gap-2 pt-4">

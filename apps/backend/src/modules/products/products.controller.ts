@@ -89,7 +89,7 @@ export class ProductsController {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado.');
     }
-    return this.csvImportService.importFromCsv(file.buffer as Buffer);
+    return this.csvImportService.importFromCsv(file.buffer);
   }
 
   @Put(':id')

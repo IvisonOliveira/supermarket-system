@@ -199,7 +199,7 @@ export default function ReportABC() {
                       border: 'none',
                       boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
-                    formatter={(value: number, name: string) => {
+                    formatter={(value: any, name: any) => {
                       if (name === 'Vendas') return [formatCurrency(value), name];
                       if (name === '% Acumulada') return [`${value.toFixed(2)}%`, name];
                       return [value, name];

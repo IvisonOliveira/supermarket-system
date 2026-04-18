@@ -1,4 +1,4 @@
-# CLAUDE.md — Sistema de Gestão para Supermercados
+# OmniMarket — Sistema de Gestão para Supermercados
 
 ## Visão Geral
 

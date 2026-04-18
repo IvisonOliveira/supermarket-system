@@ -190,18 +190,18 @@ export default function Fiscal() {
           type="date"
           label="Data Início"
           value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={(e: any) => setStartDate(e.target.value)}
         />
         <Input
           type="date"
           label="Data Fim"
           value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          onChange={(e: any) => setEndDate(e.target.value)}
         />
         <Select
           label="Status"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e: any) => setStatusFilter(e.target.value)}
           options={[
             { value: '', label: 'Todos' },
             { value: 'authorized', label: 'Autorizada' },
@@ -248,7 +248,7 @@ export default function Fiscal() {
             label="Justificativa (obrigatório)"
             placeholder="Mínimo 15 caracteres..."
             value={justificativa}
-            onChange={(e) => setJustificativa(e.target.value)}
+            onChange={(e: any) => setJustificativa(e.target.value)}
             required
             minLength={15}
           />

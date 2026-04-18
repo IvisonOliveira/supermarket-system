@@ -6,6 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          primary: '#0f2b4c',
+          secondary: '#cda03f',
+          accent: '#e8b74f',
+        },
         primary: {
           50: '#eef1f9',
           100: '#d5dcf0',

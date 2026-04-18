@@ -1,7 +1,8 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { app } from 'electron';
 import fs from 'fs';
+import path from 'path';
+
+import Database from 'better-sqlite3';
+import { app } from 'electron';
 
 // Inicializa no userData para persistir além das atualizações do app
 const dbPath = path.join(app.getPath('userData'), 'pdv.db');
@@ -123,3 +124,133 @@ export function upsertProducts(products: any[]) {
 
 // Inicializa logo que for carregado
 initDatabase();
+
+// Injeta dados mockados para testes do frontend se o banco estiver limpo
+const productCount = db.prepare('SELECT count(*) as count FROM local_products').get() as {
+  count: number;
+};
+if (productCount.count === 0) {
+  console.log('Populando banco local com dados de teste do OmniMarket...');
+  upsertProducts([
+    {
+      id: 'p1',
+      name: 'Arroz Omni Premium Escuro 5kg',
+      barcode: '7890001',
+      price: 25.99,
+      unit: 'un',
+      stock_qty: 100,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p2',
+      name: 'Salmão Dourado Posta 1kg',
+      barcode: '7890002',
+      price: 89.5,
+      unit: 'kg',
+      stock_qty: 10,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p3',
+      name: 'Azeite Extra Virgem Ouro 500ml',
+      barcode: '7890003',
+      price: 44.3,
+      unit: 'un',
+      stock_qty: 50,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p4',
+      name: 'Café Torrado Bourbon 250g',
+      barcode: '7890004',
+      price: 29.9,
+      unit: 'un',
+      stock_qty: 30,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p5',
+      name: 'Pão de Fermentação Natural',
+      barcode: '7890005',
+      price: 16.99,
+      unit: 'un',
+      stock_qty: 20,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p6',
+      name: 'Leite Orgânico A2 1L',
+      barcode: '7890006',
+      price: 8.89,
+      unit: 'un',
+      stock_qty: 100,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p7',
+      name: 'Tomate Grape Premium',
+      barcode: '2000001',
+      price: 14.99,
+      unit: 'kg',
+      stock_qty: 40,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p8',
+      name: 'Queijo Parmesão Curado',
+      barcode: '2000002',
+      price: 124.99,
+      unit: 'kg',
+      stock_qty: 15,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p9',
+      name: 'Vinho Tinto Reserva Omni',
+      barcode: '2000003',
+      price: 115.49,
+      unit: 'un',
+      stock_qty: 25,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p10',
+      name: 'Água Tônica Artesanal 350ml',
+      barcode: '7890007',
+      price: 8.99,
+      unit: 'un',
+      stock_qty: 100,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p11',
+      name: 'Sabão Líquido Premium 3L',
+      barcode: '7890008',
+      price: 52.5,
+      unit: 'un',
+      stock_qty: 40,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'p12',
+      name: 'Chocolates Finos Gold 200g',
+      barcode: '7890009',
+      price: 46.9,
+      unit: 'un',
+      stock_qty: 60,
+      image_url: '',
+      updated_at: new Date().toISOString(),
+    },
+  ]);
+}
