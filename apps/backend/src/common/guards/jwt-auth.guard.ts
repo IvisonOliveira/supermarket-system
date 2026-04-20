@@ -22,23 +22,25 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ headers: { authorization?: string }; user: unknown }>();
     const authHeader = request.headers?.authorization;
 
     if (!authHeader) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw new UnauthorizedException('Token nao fornecido');
     }
 
-    const [type, token] = authHeader.split(' ');
+    const parts = authHeader.split(' ');
+    const type = parts[0];
+    const token = parts[1];
 
     if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Formato de token inválido');
+      throw new UnauthorizedException('Formato de token invalido');
     }
 
     const { data, error } = await this.supabase.client.auth.getUser(token);
 
     if (error || !data?.user) {
-      throw new UnauthorizedException('Token inválido ou expirado');
+      throw new UnauthorizedException('Token invalido ou expirado');
     }
 
     request.user = data.user;
