@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 // eslint-disable-next-line import/no-unresolved
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AppConfigModule } from './config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CashierModule } from './modules/cashier/cashier.module';
@@ -22,7 +23,7 @@ import { UsersModule } from './modules/users/users.module';
       envFilePath: '.env',
     }),
     ScheduleModule.forRoot(),
-    AppConfigModule, // SupabaseConfig disponível globalmente
+    AppConfigModule,
     AuthModule,
     UsersModule,
     ProductsModule,
@@ -36,6 +37,10 @@ import { UsersModule } from './modules/users/users.module';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })

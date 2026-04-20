@@ -1,8 +1,8 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Public } from '../../common/decorators/public.decorator';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -13,15 +13,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Autenticar usuário usando Supabase' })
   async login(@Body() dto: LoginDto) {
-    // Chama a service com a propriedade individual desestruturada conforme requisito
     return this.authService.signIn(dto.email, dto.password);
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Invalidar a sessão do usuário no Supabase' })
