@@ -152,17 +152,20 @@ export default function PaymentModal({
     onSuccess();
   };
 
+  const btnGold =
+    'bg-[#C9A227] text-[#1B2A5E] font-black rounded-xl transition-all shadow-[0_0_18px_rgba(201,162,39,0.3)] hover:bg-[#e9be43] hover:shadow-[0_0_32px_rgba(201,162,39,0.6)] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-gray-700 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden text-white font-sans">
+      <div className="bg-[#0f1932] border border-[#1B2A5E] w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden text-white font-sans">
         {fiscalState === 'idle' ? (
           <>
-            {/* Lado Esquerdo - Totais e Botões Metódos */}
-            <div className="w-full md:w-1/3 bg-gray-800 p-8 border-r border-gray-700 flex flex-col">
-              <h2 className="text-2xl text-gray-400 font-bold tracking-widest mb-2">
+            {/* Lado Esquerdo - Totais e Métodos */}
+            <div className="w-full md:w-1/3 bg-[#0a111f] p-8 border-r border-[#1B2A5E] flex flex-col">
+              <h2 className="text-2xl text-slate-400 font-bold tracking-widest mb-2">
                 TOTAL DA VENDA
               </h2>
-              <div className="text-6xl font-black text-green-400 mb-8 tracking-tighter">
+              <div className="text-6xl font-black text-[#C9A227] mb-8 tracking-tighter drop-shadow-[0_0_12px_rgba(201,162,39,0.4)]">
                 R$ {total.toFixed(2)}
               </div>
 
@@ -172,19 +175,19 @@ export default function PaymentModal({
                     setActiveTab('dinheiro');
                     setTimeout(() => receivedInputRef.current?.focus(), 10);
                   }}
-                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'dinheiro' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'dinheiro' ? 'bg-[#C9A227] text-[#1B2A5E] shadow-[0_0_16px_rgba(201,162,39,0.4)]' : 'bg-[#152248] text-slate-300 hover:bg-[#1B2A5E] border border-[#1B2A5E]'}`}
                 >
                   Dinheiro
                 </button>
                 <button
                   onClick={() => setActiveTab('pix')}
-                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'pix' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'pix' ? 'bg-[#C9A227] text-[#1B2A5E] shadow-[0_0_16px_rgba(201,162,39,0.4)]' : 'bg-[#152248] text-slate-300 hover:bg-[#1B2A5E] border border-[#1B2A5E]'}`}
                 >
                   PIX
                 </button>
                 <button
                   onClick={() => setActiveTab('cartao')}
-                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'cartao' ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                  className={`w-full py-4 px-6 text-xl font-bold rounded-lg transition-all ${activeTab === 'cartao' ? 'bg-[#C9A227] text-[#1B2A5E] shadow-[0_0_16px_rgba(201,162,39,0.4)]' : 'bg-[#152248] text-slate-300 hover:bg-[#1B2A5E] border border-[#1B2A5E]'}`}
                 >
                   Cartão
                 </button>
@@ -192,15 +195,15 @@ export default function PaymentModal({
             </div>
 
             {/* Lado Direito - Conteúdo da Aba */}
-            <div className="w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-gray-900 border-t md:border-t-0 md:border-l border-black/50">
+            <div className="w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-[#0f1932] border-t md:border-t-0 md:border-l border-[#1B2A5E]">
               {activeTab === 'dinheiro' && (
                 <div className="w-full max-w-md flex flex-col items-center space-y-8">
                   <div className="w-full">
-                    <label className="text-2xl text-gray-400 font-bold block mb-4 text-center">
+                    <label className="text-2xl text-slate-400 font-bold block mb-4 text-center">
                       Valor Recebido
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-4xl text-gray-500 font-black">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-4xl text-slate-500 font-black">
                         R$
                       </span>
                       <input
@@ -208,17 +211,17 @@ export default function PaymentModal({
                         type="number"
                         min="0"
                         step="0.01"
-                        className="w-full bg-gray-800 border-2 border-gray-600 rounded-xl text-5xl font-black py-6 pl-20 pr-6 outline-none focus:border-blue-500 transition-colors shadow-inner text-center"
+                        className="w-full bg-[#152248] border-2 border-[#1B2A5E] rounded-xl text-5xl font-black py-6 pl-20 pr-6 outline-none focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/30 transition-colors shadow-inner text-center"
                         value={receivedAmount || ''}
                         onChange={(e) => setReceivedAmount(Number(e.target.value) || 0)}
                       />
                     </div>
                   </div>
 
-                  <div className="w-full bg-gray-800 p-6 rounded-xl border border-gray-700 text-center shadow-inner">
-                    <span className="text-xl text-gray-400 font-medium block mb-2">Troco</span>
+                  <div className="w-full bg-[#152248] p-6 rounded-xl border border-[#1B2A5E] text-center shadow-inner">
+                    <span className="text-xl text-slate-400 font-medium block mb-2">Troco</span>
                     <span
-                      className={`text-6xl font-black block ${change > 0 ? 'text-orange-400' : 'text-gray-500'}`}
+                      className={`text-6xl font-black block ${change > 0 ? 'text-orange-400' : 'text-slate-500'}`}
                     >
                       R$ {change.toFixed(2)}
                     </span>
@@ -227,7 +230,7 @@ export default function PaymentModal({
                   <button
                     disabled={!isDinheiroValid}
                     onClick={() => handleConfirm('dinheiro')}
-                    className="w-full bg-brand-secondary hover:bg-brand-accent disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white text-3xl font-black py-6 rounded-xl transition-all shadow-[0_0_15px_rgba(205,160,63,0.3)] hover:shadow-[0_0_20px_rgba(232,183,79,0.5)] active:scale-95"
+                    className={`w-full py-6 text-3xl ${btnGold}`}
                   >
                     CONFIRMAR
                   </button>
@@ -236,15 +239,15 @@ export default function PaymentModal({
 
               {activeTab === 'pix' && (
                 <div className="w-full max-w-md flex flex-col items-center space-y-10">
-                  <div className="w-64 h-64 bg-gray-800 border-4 border-dashed border-gray-600 rounded-2xl flex items-center justify-center p-4">
-                    <p className="text-center text-gray-400 text-xl font-medium">
+                  <div className="w-64 h-64 bg-[#152248] border-4 border-dashed border-[#1B2A5E] rounded-2xl flex items-center justify-center p-4">
+                    <p className="text-center text-slate-400 text-xl font-medium">
                       QR Code será exibido aqui
                     </p>
                   </div>
 
                   <button
                     onClick={() => handleConfirm('pix')}
-                    className="w-full bg-brand-secondary hover:bg-brand-accent text-white text-3xl font-black py-6 rounded-xl transition-all shadow-[0_0_15px_rgba(205,160,63,0.3)] hover:shadow-[0_0_20px_rgba(232,183,79,0.5)] active:scale-95 flex items-center justify-center gap-3"
+                    className={`w-full py-6 text-3xl flex items-center justify-center gap-3 ${btnGold}`}
                   >
                     <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -256,13 +259,12 @@ export default function PaymentModal({
 
               {activeTab === 'cartao' && (
                 <div className="w-full max-w-md flex flex-col items-center space-y-10">
-                  <div className="w-full py-16 bg-gray-800 border border-gray-700 rounded-2xl flex flex-col items-center justify-center shadow-inner">
+                  <div className="w-full py-16 bg-[#152248] border border-[#1B2A5E] rounded-2xl flex flex-col items-center justify-center shadow-inner">
                     <svg
-                      className="w-20 h-20 text-gray-600 mb-6"
+                      className="w-20 h-20 text-slate-600 mb-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         strokeLinecap="round"
@@ -271,14 +273,14 @@ export default function PaymentModal({
                         d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                       />
                     </svg>
-                    <p className="text-center text-gray-400 text-xl font-medium px-4">
+                    <p className="text-center text-slate-400 text-xl font-medium px-4">
                       Aguardando integração TEF
                     </p>
                   </div>
 
                   <button
                     onClick={() => handleConfirm('cartao_credito')}
-                    className="w-full bg-brand-secondary hover:bg-brand-accent text-white text-2xl font-black py-6 rounded-xl transition-all shadow-[0_0_15px_rgba(205,160,63,0.3)] hover:shadow-[0_0_20px_rgba(232,183,79,0.5)] active:scale-95"
+                    className={`w-full py-6 text-2xl ${btnGold}`}
                   >
                     SIMULAR APROVAÇÃO
                   </button>
@@ -290,9 +292,9 @@ export default function PaymentModal({
           <div className="w-full p-12 flex flex-col items-center justify-center text-center">
             {fiscalState === 'emitting' && (
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <div className="w-16 h-16 border-4 border-[#C9A227] border-t-transparent rounded-full animate-spin mb-6"></div>
                 <h2 className="text-3xl font-bold text-white">Emitindo NFC-e...</h2>
-                <p className="text-gray-400 mt-4">Aguardando autorização da Sefaz</p>
+                <p className="text-slate-400 mt-4">Aguardando autorização da Sefaz</p>
               </div>
             )}
 
@@ -314,26 +316,26 @@ export default function PaymentModal({
                 <h2 className="text-3xl font-bold text-green-400 mb-2">
                   NF Autorizada com Sucesso!
                 </h2>
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 w-full my-6 text-center">
-                  <p className="text-sm text-gray-400 mb-1">Chave de Acesso:</p>
+                <div className="bg-[#152248] p-4 rounded-lg border border-[#1B2A5E] w-full my-6 text-center">
+                  <p className="text-sm text-slate-400 mb-1">Chave de Acesso:</p>
                   <p className="font-mono text-lg break-all text-white">{accessKey}</p>
                 </div>
                 <div className="flex gap-4 w-full">
                   <button
                     onClick={onSuccess}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
                   >
                     Fechar
                   </button>
                   <button
                     onClick={() => alert('Simulando impressão...')}
-                    className="flex-1 bg-brand-secondary hover:bg-brand-accent text-white font-bold py-4 rounded-xl shadow-lg"
+                    className={`flex-1 py-4 text-base ${btnGold}`}
                   >
                     Imprimir Cupom
                   </button>
                   <button
                     onClick={() => alert('Simulando envio de email...')}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl"
+                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
                   >
                     Enviar Email
                   </button>
@@ -357,17 +359,17 @@ export default function PaymentModal({
                   />
                 </svg>
                 <h2 className="text-3xl font-bold text-red-400 mb-2">Falha na Emissão</h2>
-                <p className="text-gray-300 mb-8 w-full">{errorMsg}</p>
+                <p className="text-slate-300 mb-8 w-full">{errorMsg}</p>
                 <div className="flex gap-4 w-full">
                   <button
                     onClick={() => handleConfirm(activeTab, currentSaleId!)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl"
+                    className={`flex-1 py-4 text-base ${btnGold}`}
                   >
                     Tentar Novamente
                   </button>
                   <button
                     onClick={handleSkipFiscal}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
                   >
                     Continuar sem NF
                   </button>
@@ -378,11 +380,11 @@ export default function PaymentModal({
         )}
       </div>
 
-      {/* Botão Cancelar FLutuante fora do Card para foco imediato */}
+      {/* Botão Cancelar flutuante */}
       {fiscalState === 'idle' && (
         <button
           onClick={onClose}
-          className="absolute top-8 right-8 text-white hover:text-red-400 bg-gray-800 border border-gray-700 hover:border-red-400 px-6 py-3 rounded-lg font-bold text-xl transition-all"
+          className="absolute top-8 right-8 text-white hover:text-red-400 bg-[#0f1932] border border-[#1B2A5E] hover:border-red-400 px-6 py-3 rounded-lg font-bold text-xl transition-all"
         >
           VOLTAR (ESC)
         </button>
