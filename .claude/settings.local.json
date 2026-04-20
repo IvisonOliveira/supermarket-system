@@ -17,7 +17,8 @@
       "Bash(awk '{print $5}')",
       "Bash(xargs -r taskkill //F //PID)",
       "Bash(npx eslint *)",
-      "Bash(npx prettier *)"
+      "Bash(npx prettier *)",
+      "Bash(npm run *)"
     ]
   }
 }
