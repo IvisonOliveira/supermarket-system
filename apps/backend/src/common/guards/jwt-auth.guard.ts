@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core';
 
 import { SupabaseConfig } from '../../config/supabase.config';
-
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
