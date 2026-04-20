@@ -137,7 +137,10 @@ export default function PDV() {
 
     const t = setTimeout(() => {
       if (window.electronAPI?.db?.searchProducts) {
-        window.electronAPI.db.searchProducts(searchQuery).then(setSearchResults).catch(console.error);
+        window.electronAPI.db
+          .searchProducts(searchQuery)
+          .then(setSearchResults)
+          .catch(console.error);
       }
     }, 200);
 
@@ -345,7 +348,12 @@ export default function PDV() {
                             setItems((prev) =>
                               prev.map((it, i) =>
                                 i === index
-                                  ? { ...it, quantity: weight, subtotal: weight * it.price, isWeighing: false }
+                                  ? {
+                                      ...it,
+                                      quantity: weight,
+                                      subtotal: weight * it.price,
+                                      isWeighing: false,
+                                    }
                                   : it,
                               ),
                             );
@@ -367,7 +375,10 @@ export default function PDV() {
                         onFocus={(e) => e.target.select()}
                         onBlur={confirmEditingQty}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') { e.preventDefault(); confirmEditingQty(); }
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            confirmEditingQty();
+                          }
                           if (e.key === 'Escape') {
                             e.preventDefault();
                             setEditingQtyIndex(null);
