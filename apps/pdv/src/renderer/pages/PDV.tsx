@@ -18,15 +18,26 @@ export default function PDV() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [currentScaleWeight, setCurrentScaleWeight] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+
+  // Edição inline de quantidade (F2) — substitui window.prompt que não funciona no Electron
+  const [editingQtyIndex, setEditingQtyIndex] = useState<number | null>(null);
+  const [editingQtyValue, setEditingQtyValue] = useState('');
+
+  // Índice do item destacado no painel de busca/atalhos (-1 = nenhum)
+  const [searchNavIndex, setSearchNavIndex] = useState(-1);
+
+  // Modo carrinho: setas navegam o carrinho em vez do painel direito
+  const [cartNavMode, setCartNavMode] = useState(false);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Funções de manipulação
+  // ─── Funções de manipulação ───────────────────────────────────────────────
+
   const addItem = (product: Product, qty: number = 1) => {
     setItems((prev) => {
       if (product.unit === 'kg') {
         return [{ ...product, quantity: 0, subtotal: 0, isWeighing: true }, ...prev];
       }
-
       const existing = prev.find((i) => i.id === product.id);
       if (existing) {
         return prev.map((i) =>
@@ -40,6 +51,8 @@ export default function PDV() {
     setSearchQuery('');
     setSearchResults([]);
     setSelectedIndex(0);
+    setSearchNavIndex(-1);
+    setCartNavMode(false);
     setTimeout(() => searchInputRef.current?.focus(), 10);
   };
 
@@ -56,6 +69,13 @@ export default function PDV() {
         i === index ? { ...item, quantity: qty, subtotal: qty * item.price } : item,
       ),
     );
+  };
+
+  const confirmEditingQty = () => {
+    if (editingQtyIndex === null) return;
+    const qty = parseFloat(editingQtyValue);
+    if (!isNaN(qty) && qty > 0) updateQty(editingQtyIndex, qty);
+    setEditingQtyIndex(null);
     setTimeout(() => searchInputRef.current?.focus(), 10);
   };
 
@@ -65,6 +85,8 @@ export default function PDV() {
     setSearchQuery('');
     setSearchResults([]);
     setSelectedIndex(0);
+    setSearchNavIndex(-1);
+    setCartNavMode(false);
     setTimeout(() => searchInputRef.current?.focus(), 10);
   };
 
@@ -73,7 +95,9 @@ export default function PDV() {
     return Math.max(0, sub - discount);
   };
 
-  // Efeito de escuta da balança
+  // ─── Efeitos ─────────────────────────────────────────────────────────────
+
+  // Balança
   useEffect(() => {
     if (!window.electronAPI?.scale?.onWeight) return;
     const cleanup = window.electronAPI.scale.onWeight((weight: number) => {
@@ -82,132 +106,206 @@ export default function PDV() {
     return () => cleanup();
   }, []);
 
-  // Efeito de escuta do scanner via IPC
+  // Scanner via IPC
   useEffect(() => {
     if (!window.electronAPI?.barcode?.onScanned) return;
-
     const cleanup = window.electronAPI.barcode.onScanned(
       async ({ code }: { code: string; isScanner: boolean }) => {
         try {
           const product = await window.electronAPI.db.getProductByBarcode(code);
-          if (product) {
-            addItem(product, 1);
-          } else {
-            alert('Produto não encontrado');
-          }
+          if (product) addItem(product, 1);
+          else alert('Produto não encontrado');
         } catch (err) {
           console.error('Erro na busca de barcode via IPC:', err);
         }
       },
     );
-
-    return () => {
-      cleanup();
-    };
+    return () => cleanup();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Efeito de busca
+  // Busca com debounce; reseta navegação no painel direito ao digitar
   useEffect(() => {
+    setSearchNavIndex(-1);
+
     if (!searchQuery.trim()) {
-      // Exibe fallback (produtos mais vendidos)
       if (window.electronAPI?.db?.getProducts) {
         window.electronAPI.db.getProducts().then(setSearchResults).catch(console.error);
       }
       return;
     }
 
-    const timeoutDesc = setTimeout(() => {
+    const t = setTimeout(() => {
       if (window.electronAPI?.db?.searchProducts) {
-        window.electronAPI.db
-          .searchProducts(searchQuery)
-          .then(setSearchResults)
-          .catch(console.error);
+        window.electronAPI.db.searchProducts(searchQuery).then(setSearchResults).catch(console.error);
       }
-    }, 200); // 200ms debounce
+    }, 200);
 
-    return () => clearTimeout(timeoutDesc);
+    return () => clearTimeout(t);
   }, [searchQuery]);
 
-  // Efeito de Atalhos Globais e Navegação por Teclado
+  // ─── Atalhos globais + navegação por teclado ──────────────────────────────
   useEffect(() => {
     if (isPaymentOpen) return;
 
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      // Quando a edição inline de quantidade está ativa, apenas Escape cancela
+      if (editingQtyIndex !== null) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setEditingQtyIndex(null);
+          setTimeout(() => searchInputRef.current?.focus(), 10);
+        }
+        return;
+      }
+
+      const isSearchFocused = document.activeElement === searchInputRef.current;
+
+      // F1 — volta ao modo busca
       if (e.key === 'F1') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        setCartNavMode(false);
+        setSearchNavIndex(-1);
+        setTimeout(() => searchInputRef.current?.focus(), 10);
+        return;
       }
+
+      // F2 — edição inline de quantidade do item selecionado
       if (e.key === 'F2') {
         e.preventDefault();
         if (items.length > 0) {
-          const newQty = window.prompt(
-            'Nova quantidade:',
-            items[selectedIndex]?.quantity.toString() || '1',
+          const item = items[selectedIndex];
+          setEditingQtyValue(
+            item.unit === 'kg' ? item.quantity.toFixed(3) : item.quantity.toString(),
           );
-          if (newQty && !isNaN(Number(newQty))) updateQty(selectedIndex, Number(newQty));
+          setEditingQtyIndex(selectedIndex);
         }
+        return;
       }
+
+      // F3 — foca campo de desconto (sem window.prompt)
       if (e.key === 'F3') {
         e.preventDefault();
-        const newDesc = window.prompt('Valor do desconto: R$', discount.toString());
-        if (newDesc && !isNaN(Number(newDesc))) setDiscount(Number(newDesc));
+        document.getElementById('discount')?.focus();
+        return;
       }
+
       if (e.key === 'F5') {
         e.preventDefault();
         if (items.length > 0) setIsPaymentOpen(true);
+        return;
       }
+
       if (e.key === 'F8') {
         e.preventDefault();
         if (items.length > 0 && window.confirm('Deseja realmente cancelar a venda atual?'))
           clearSale();
+        return;
       }
+
       if (e.key === 'F4' || e.key === 'Delete') {
-        const activeEl = document.activeElement;
-        if (activeEl === searchInputRef.current && e.key === 'Delete' && searchQuery.length > 0)
-          return;
+        if (isSearchFocused && e.key === 'Delete' && searchQuery.length > 0) return;
         e.preventDefault();
         if (items.length > 0) removeItem(selectedIndex);
+        return;
       }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.max(0, prev - 1));
-      }
+
+      // ── Setas ──────────────────────────────────────────────────────────────
+      // cartNavMode=false → setas navegam painel direito (busca/atalhos)
+      // cartNavMode=true  → setas navegam carrinho
+
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((prev) => Math.min(items.length - 1, prev + 1));
+        if (!cartNavMode) {
+          if (searchResults.length > 0)
+            setSearchNavIndex((prev) =>
+              prev === -1 ? 0 : Math.min(prev + 1, searchResults.length - 1),
+            );
+        } else {
+          setSelectedIndex((prev) => Math.min(items.length - 1, prev + 1));
+        }
+        return;
       }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!cartNavMode) {
+          if (searchNavIndex > 0) setSearchNavIndex((prev) => prev - 1);
+          else if (searchNavIndex === 0) setSearchNavIndex(-1);
+        } else {
+          setSelectedIndex((prev) => Math.max(0, prev - 1));
+        }
+        return;
+      }
+
+      // Enter com item destacado no painel direito
+      if (e.key === 'Enter' && searchNavIndex >= 0 && !isSearchFocused) {
+        e.preventDefault();
+        const product = searchResults[searchNavIndex];
+        if (product) addItem(product);
+        return;
+      }
+
+      // Escape — alterna modo busca ↔ modo carrinho via estado explícito
       if (e.key === 'Escape') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        if (searchNavIndex >= 0) {
+          setSearchNavIndex(-1);
+        } else if (!cartNavMode) {
+          setCartNavMode(true);
+          searchInputRef.current?.blur();
+        } else {
+          setCartNavMode(false);
+          setSearchNavIndex(-1);
+          setTimeout(() => searchInputRef.current?.focus(), 10);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPaymentOpen, items, selectedIndex, discount, searchQuery]);
+  }, [
+    isPaymentOpen,
+    items,
+    selectedIndex,
+    discount,
+    searchQuery,
+    searchResults,
+    editingQtyIndex,
+    searchNavIndex,
+    cartNavMode,
+  ]);
 
-  // Scroll automático do item selecionado
+  // Scroll automático — item do carrinho selecionado
   useEffect(() => {
     const el = document.getElementById(`item-${selectedIndex}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [selectedIndex, items.length]);
 
-  // Manipulador de tecla para código de barras (Enter)
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  // Scroll automático — item destacado no painel de busca/atalhos
+  useEffect(() => {
+    if (searchNavIndex < 0) return;
+    const el = document.getElementById(`result-${searchNavIndex}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [searchNavIndex]);
+
+  // ─── Handler do input de busca (Enter e setas) ────────────────────────────
+  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const match = searchResults.find((p) => p.barcode === searchQuery || p.id === searchQuery);
-      if (match) {
-        addItem(match, 1);
-      } else if (searchResults.length > 0) {
-        // Se bateu enter na busca de texto, adiciona o primeiro
-        addItem(searchResults[0], 1);
+      if (searchNavIndex >= 0 && searchResults[searchNavIndex]) {
+        // Adiciona o produto destacado pelas setas
+        addItem(searchResults[searchNavIndex]);
+      } else {
+        // Comportamento original: código de barras exato ou primeiro resultado
+        const match = searchResults.find((p) => p.barcode === searchQuery || p.id === searchQuery);
+        if (match) addItem(match, 1);
+        else if (searchResults.length > 0) addItem(searchResults[0], 1);
       }
     }
   };
+
+  // ─── JSX ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex h-screen bg-[#0a111f] text-white overflow-hidden font-sans">
@@ -224,7 +322,11 @@ export default function PDV() {
               <div
                 id={`item-${index}`}
                 key={`${item.id}-${index}`}
-                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40' : 'bg-[#152248] border-[#1B2A5E]'}`}
+                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${
+                  index === selectedIndex
+                    ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
+                    : 'bg-[#152248] border-[#1B2A5E]'
+                }`}
               >
                 <div className="flex-1 pr-4">
                   <span className="text-white block text-2xl font-bold truncate">{item.name}</span>
@@ -243,12 +345,7 @@ export default function PDV() {
                             setItems((prev) =>
                               prev.map((it, i) =>
                                 i === index
-                                  ? {
-                                      ...it,
-                                      quantity: weight,
-                                      subtotal: weight * it.price,
-                                      isWeighing: false,
-                                    }
+                                  ? { ...it, quantity: weight, subtotal: weight * it.price, isWeighing: false }
                                   : it,
                               ),
                             );
@@ -258,6 +355,27 @@ export default function PDV() {
                           Usar Peso
                         </button>
                       </>
+                    ) : editingQtyIndex === index ? (
+                      // ── Edição inline de quantidade (F2) ──
+                      <input
+                        autoFocus
+                        type="number"
+                        min="0.001"
+                        step={item.unit === 'kg' ? '0.001' : '1'}
+                        value={editingQtyValue}
+                        onChange={(e) => setEditingQtyValue(e.target.value)}
+                        onFocus={(e) => e.target.select()}
+                        onBlur={confirmEditingQty}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') { e.preventDefault(); confirmEditingQty(); }
+                          if (e.key === 'Escape') {
+                            e.preventDefault();
+                            setEditingQtyIndex(null);
+                            setTimeout(() => searchInputRef.current?.focus(), 10);
+                          }
+                        }}
+                        className="w-28 bg-[#0a111f] border-2 border-[#C9A227] rounded-lg text-center text-2xl font-bold text-white outline-none ring-2 ring-[#C9A227]/40 py-1"
+                      />
                     ) : (
                       <>
                         <button
@@ -314,6 +432,13 @@ export default function PDV() {
                   className="bg-transparent border-b-2 border-[#1B2A5E] text-3xl font-bold ml-3 w-32 outline-none focus:border-[#C9A227] group-hover:border-slate-500 transition-colors pt-1"
                   value={discount || ''}
                   onChange={(e) => setDiscount(Number(e.target.value) || 0)}
+                  onKeyDown={(e) => {
+                    // Enter ou Escape no campo de desconto volta ao input de busca
+                    if (e.key === 'Enter' || e.key === 'Escape') {
+                      e.preventDefault();
+                      searchInputRef.current?.focus();
+                    }
+                  }}
                   placeholder="0.00"
                 />
               </div>
@@ -335,7 +460,7 @@ export default function PDV() {
             <button
               disabled={items.length === 0}
               onClick={() => setIsPaymentOpen(true)}
-              className="flex-[3] bg-[#1B2A5E] hover:bg-[#C9A227] hover:text-[#1B2A5E] disabled:opacity-40 disabled:cursor-not-allowed text-white text-4xl font-black py-6 rounded-lg border-2 border-[#C9A227] transition-all shadow-[0_0_20px_rgba(201,162,39,0.2)] hover:shadow-[0_0_28px_rgba(201,162,39,0.5)] active:scale-[0.98]"
+              className="flex-[3] bg-[#C9A227] text-[#1B2A5E] disabled:opacity-40 disabled:cursor-not-allowed text-4xl font-black py-6 rounded-lg transition-all shadow-[0_0_24px_rgba(201,162,39,0.35)] hover:bg-[#e9be43] hover:shadow-[0_0_40px_rgba(201,162,39,0.65)] active:scale-[0.98]"
             >
               FINALIZAR VENDA
             </button>
@@ -345,10 +470,15 @@ export default function PDV() {
 
       {/* PAINEL DIREITO: BUSCA E ATALHOS (40%) */}
       <div className="w-[40%] flex flex-col p-8 bg-[#0a111f] border-l border-[#1B2A5E]/50 shadow-[-10px_0_20px_rgba(0,0,0,0.3)] z-10 relative">
-        {/* Logo no topo do painel */}
+        {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/logos/OmniMarket-Negative-Transparent.png" alt="OmniMarket" className="h-10" />
+          <img
+            src="/logos/OmniMarket-Dark-Transparent.png"
+            alt="OmniMarket"
+            className="h-40 drop-shadow-[0_0_18px_rgba(201,162,39,0.25)]"
+          />
         </div>
+
         <input
           ref={searchInputRef}
           autoFocus
@@ -356,7 +486,7 @@ export default function PDV() {
           placeholder="CÓDIGO DE BARRAS"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleSearchKeyDown}
         />
 
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -371,11 +501,16 @@ export default function PDV() {
                   <p className="text-slate-500 mt-2 text-sm">Verifique o código ou descrição</p>
                 </div>
               ) : (
-                searchResults.map((p) => (
+                searchResults.map((p, idx) => (
                   <button
+                    id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className="w-full text-left p-5 bg-[#0f1932] hover:bg-[#1B2A5E] rounded-lg mb-3 transition-colors flex justify-between items-center focus:ring-4 focus:ring-[#C9A227]/40 outline-none border border-[#1B2A5E] hover:border-[#C9A227] group"
+                    className={`w-full text-left p-5 rounded-lg mb-3 transition-colors flex justify-between items-center outline-none border group ${
+                      searchNavIndex === idx
+                        ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
+                        : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
+                    }`}
                   >
                     <div>
                       <div className="text-2xl font-bold text-slate-100 group-hover:text-white truncate max-w-[280px]">
@@ -383,7 +518,9 @@ export default function PDV() {
                       </div>
                       <div className="text-base font-mono text-slate-500 mt-2">{p.barcode}</div>
                     </div>
-                    <div className="text-2xl font-black text-[#C9A227] group-hover:text-[#e9be43]">
+                    <div
+                      className={`text-2xl font-black ${searchNavIndex === idx ? 'text-[#C9A227]' : 'text-[#C9A227] group-hover:text-[#e9be43]'}`}
+                    >
                       R$ {p.price.toFixed(2)}
                     </div>
                   </button>
@@ -399,11 +536,16 @@ export default function PDV() {
                 </span>
               </h3>
               <div className="grid grid-cols-2 2xl:grid-cols-3 gap-4">
-                {searchResults.slice(0, 12).map((p) => (
+                {searchResults.slice(0, 12).map((p, idx) => (
                   <button
+                    id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className="bg-[#0f1932] hover:bg-[#1B2A5E] p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border border-[#1B2A5E] hover:border-[#C9A227] active:scale-95 group"
+                    className={`p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border active:scale-95 group ${
+                      searchNavIndex === idx
+                        ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
+                        : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
+                    }`}
                   >
                     <span className="text-center w-full mb-3 text-xl font-semibold text-slate-300 group-hover:text-white line-clamp-3 leading-snug">
                       {p.name}
@@ -424,7 +566,7 @@ export default function PDV() {
         </div>
       </div>
 
-      {/* BARRA DE ATALHOS GLOBAL (RODAPÉ INFERIOR DIREITO) */}
+      {/* BARRA DE ATALHOS GLOBAL */}
       <div className="absolute bottom-0 right-0 w-[40%] bg-[#060c18] border-t border-[#1B2A5E] py-2 px-4 shadow-[0_-5px_10px_rgba(0,0,0,0.4)] z-50">
         <p className="text-slate-600 text-xs font-mono font-medium tracking-wide text-center">
           <span className="text-[#C9A227] font-bold ml-3">F1</span> Busca |
@@ -433,7 +575,8 @@ export default function PDV() {
           <span className="text-[#C9A227] font-bold ml-3">F5</span> Pagar |
           <span className="text-[#C9A227] font-bold ml-3">F8</span> Cancelar |
           <span className="text-[#C9A227] font-bold ml-3">Del/F4</span> Remover |
-          <span className="text-[#C9A227] font-bold ml-3">↑↓</span> Navegar
+          <span className="text-[#C9A227] font-bold ml-3">↑↓</span> Navegar |
+          <span className="text-[#C9A227] font-bold ml-3">Esc</span> Modo
         </p>
       </div>
 

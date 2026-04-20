@@ -110,11 +110,11 @@ export default function Layout({ children, title }: LayoutProps) {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-white/10">
+      <div className="h-16 px-6 border-b border-white/10 flex items-center justify-center shrink-0">
         <img
           src="/logos/OmniMarket-Dark-Transparent.png"
           alt="OmniMarket"
-          className="h-10 w-auto"
+          className="w-full max-h-20 object-contain"
         />
       </div>
 
@@ -252,7 +252,7 @@ export default function Layout({ children, title }: LayoutProps) {
       {/* Área principal */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 h-16 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 h-16 flex items-center justify-between shrink-0 shadow-sm z-10 min-h-0">
           <div className="flex items-center gap-3">
             {/* Hamburguer mobile */}
             <button
