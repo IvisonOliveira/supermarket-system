@@ -34,7 +34,7 @@
     "@types/uuid": "^9.0.8",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
-    "electron": "^30.0.1",
+    "electron": "^30.5.1",
     "electron-builder": "^24.13.3",
     "electron-rebuild": "^3.2.9",
     "postcss": "^8.4.38",

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Layout from './components/Layout';
@@ -14,6 +15,21 @@ import { useAuthStore } from './store/useAppStore';
 
 function PrivateRoute({ children, title }: { children: JSX.Element; title?: string }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const [hasHydrated, setHasHydrated] = useState(useAuthStore.persist.hasHydrated());
+
+  useEffect(() => {
+    const unsubFinishHydration = useAuthStore.persist.onFinishHydration(() => setHasHydrated(true));
+    setHasHydrated(useAuthStore.persist.hasHydrated());
+
+    return () => {
+      unsubFinishHydration();
+    };
+  }, []);
+
+  if (!hasHydrated) {
+    return null;
+  }
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <Layout title={title}>{children}</Layout>;
 }
