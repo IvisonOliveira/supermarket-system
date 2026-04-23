@@ -1,10 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
+
 import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Injectable()
 export class CategoriesService {
-  constructor(private readonly supabase: SupabaseConfig) {}
+  constructor(private readonly supabase: SupabaseConfig) { }
 
   async findAll() {
     const { data, error } = await this.supabase.serviceClient

@@ -9,13 +9,13 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AppConfigModule } from './config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CashierModule } from './modules/cashier/cashier.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 import { FiscalModule } from './modules/fiscal/fiscal.module';
 import { ProductsModule } from './modules/products/products.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { StockModule } from './modules/stock/stock.module';
 import { UsersModule } from './modules/users/users.module';
-import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -46,4 +46,4 @@ import { CategoriesModule } from './modules/categories/categories.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

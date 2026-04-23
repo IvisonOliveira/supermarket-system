@@ -1,14 +1,16 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { Roles } from '../../common/decorators/roles.decorator';
+
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiTags('categories')
 @ApiBearerAuth()
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Get()
   findAll() {
