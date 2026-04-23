@@ -10,7 +10,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 @ApiBearerAuth()
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) { }
+  constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
   findAll() {
