@@ -15,6 +15,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { StockModule } from './modules/stock/stock.module';
 import { UsersModule } from './modules/users/users.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UsersModule } from './modules/users/users.module';
     CashierModule,
     FiscalModule,
     ReportsModule,
+    CategoriesModule,
   ],
   providers: [
     {
