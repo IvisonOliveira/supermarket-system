@@ -16,8 +16,18 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas. Verifique seu e-mail e senha.');
     }
 
+    const { data: profile } = await this.supabase.serviceClient
+      .from('users')
+      .select('id, name, role, active')
+      .eq('id', data.user.id)
+      .single();
+
+    if (!profile || !profile.active) {
+      throw new UnauthorizedException('Usuário inativo ou não encontrado.');
+    }
+
     return {
-      user: data.user,
+      user: { ...data.user, name: profile.name, role: profile.role },
       token: data.session.access_token,
       refreshToken: data.session.refresh_token,
     };

@@ -33,7 +33,7 @@ export default function PDV() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // ─── Funções de manipulação ───────────────────────────────────────────────
+  // ─── Funções de manipulação ────────────────────────────────────────────────
 
   const addItem = (product: Product, qty: number = 1) => {
     setItems((prev) => {
@@ -110,7 +110,7 @@ export default function PDV() {
     setDiscount(Number(((pct / 100) * sub).toFixed(2)));
   };
 
-  // ─── Efeitos ─────────────────────────────────────────────────────────────
+  // ─── Efeitos ─────────────────────────────────────────────────────────────────
 
   // Balança
   useEffect(() => {
@@ -162,7 +162,7 @@ export default function PDV() {
     return () => clearTimeout(t);
   }, [searchQuery]);
 
-  // ─── Atalhos globais + navegação por teclado ──────────────────────────────
+  // ─── Atalhos globais + navegação por teclado ─────────────────────────────────
   useEffect(() => {
     if (isPaymentOpen) return;
 
@@ -234,7 +234,7 @@ export default function PDV() {
         return;
       }
 
-      // ── Setas ──────────────────────────────────────────────────────────────
+      // ── Setas ────────────────────────────────────────────────────────────────────
       // cartNavMode=false → setas navegam painel direito (busca/atalhos)
       // cartNavMode=true  → setas navegam carrinho
 
@@ -314,7 +314,7 @@ export default function PDV() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [searchNavIndex]);
 
-  // ─── Handler do input de busca (Enter e setas) ────────────────────────────
+  // ─── Handler do input de busca (Enter e setas) ────────────────────────
   const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -330,7 +330,7 @@ export default function PDV() {
     }
   };
 
-  // ─── JSX ──────────────────────────────────────────────────────────────────
+  // ─── JSX ─────────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex h-screen bg-[#0a111f] text-white overflow-hidden font-sans">

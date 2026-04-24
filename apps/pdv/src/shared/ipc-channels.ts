@@ -5,7 +5,7 @@
  * que preload.ts e ipc-handlers.ts usem sempre os mesmos nomes de canal.
  */
 
-// ── Nomes de canal ──────────────────────────────────────────────────────────
+// ── Nomes de canal ───────────────────────────────────────────────────────────
 
 export const IPC = {
   // Auth
@@ -35,7 +35,7 @@ export const IPC = {
   SYNC_STATUS: 'sync:status', // canal de evento (main → renderer)
 } as const;
 
-// ── Tipos de dados ──────────────────────────────────────────────────────────
+// ── Tipos de dados ───────────────────────────────────────────────────────────
 
 export interface Product {
   id: string;
@@ -68,7 +68,7 @@ export interface ReceiptData {
   store_cnpj: string;
 }
 
-// ── Interface da API exposta pelo preload ───────────────────────────────────
+// ── Interface da API exposta pelo preload ────────────────────────────────────
 
 export interface ElectronAPI {
   auth: {
