@@ -70,7 +70,12 @@ export default function ProductForm() {
     // Carregar produto se estiver em modo de edição
     if (isEditing) {
       api
-        .get(`/products/${id}`)
+        .get(`/products/${id}`, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+          },
+        })
         .then((res) => {
           const product = res.data;
           reset({
