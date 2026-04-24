@@ -124,5 +124,3 @@ export function upsertProducts(products: any[]) {
 
 // Inicializa logo que for carregado
 initDatabase();
-
-

@@ -40,7 +40,7 @@ export class ProductsController {
     private readonly productsService: ProductsService,
     private readonly ibptService: IbptService,
     private readonly csvImportService: CsvImportService,
-  ) { }
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Listar produtos com paginação e filtros' })

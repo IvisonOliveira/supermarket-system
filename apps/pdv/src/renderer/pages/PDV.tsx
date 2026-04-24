@@ -347,10 +347,11 @@ export default function PDV() {
               <div
                 id={`item-${index}`}
                 key={`${item.id}-${index}`}
-                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex
+                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${
+                  index === selectedIndex
                     ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                     : 'bg-[#152248] border-[#1B2A5E]'
-                  }`}
+                }`}
               >
                 <div className="flex-1 pr-4">
                   <span className="text-white block text-2xl font-bold truncate">{item.name}</span>
@@ -370,11 +371,11 @@ export default function PDV() {
                               prev.map((it, i) =>
                                 i === index
                                   ? {
-                                    ...it,
-                                    quantity: weight,
-                                    subtotal: weight * it.price,
-                                    isWeighing: false,
-                                  }
+                                      ...it,
+                                      quantity: weight,
+                                      subtotal: weight * it.price,
+                                      isWeighing: false,
+                                    }
                                   : it,
                               ),
                             );
@@ -560,10 +561,11 @@ export default function PDV() {
                     id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className={`w-full text-left p-5 rounded-lg mb-3 transition-colors flex justify-between items-center outline-none border group ${searchNavIndex === idx
+                    className={`w-full text-left p-5 rounded-lg mb-3 transition-colors flex justify-between items-center outline-none border group ${
+                      searchNavIndex === idx
                         ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                         : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
-                      }`}
+                    }`}
                   >
                     <div>
                       <div className="text-2xl font-bold text-slate-100 group-hover:text-white truncate max-w-[280px]">
@@ -594,10 +596,11 @@ export default function PDV() {
                     id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className={`p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border active:scale-95 group ${searchNavIndex === idx
+                    className={`p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border active:scale-95 group ${
+                      searchNavIndex === idx
                         ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                         : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
-                      }`}
+                    }`}
                   >
                     <span className="text-center w-full mb-3 text-xl font-semibold text-slate-300 group-hover:text-white line-clamp-3 leading-snug">
                       {p.name}

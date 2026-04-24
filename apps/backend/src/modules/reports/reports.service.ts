@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+
 import { SupabaseConfig } from '../../config/supabase.config';
 
 @Injectable()
@@ -165,7 +166,8 @@ export class ReportsService {
   async resumoDiario(dateParam: string) {
     // Se mandou 2026-04-10, encapsula pro range inteiro do dia UTC
     const d = new Date(dateParam ?? new Date().toISOString().slice(0, 10));
-    if (isNaN(d.getTime())) throw new BadRequestException('Data inválida. Use o formato YYYY-MM-DD.');
+    if (isNaN(d.getTime()))
+      throw new BadRequestException('Data inválida. Use o formato YYYY-MM-DD.');
     const startStr = new Date(d.setUTCHours(0, 0, 0, 0)).toISOString();
     const endStr = new Date(d.setUTCHours(23, 59, 59, 999)).toISOString();
 

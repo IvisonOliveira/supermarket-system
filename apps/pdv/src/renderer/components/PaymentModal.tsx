@@ -55,12 +55,16 @@ export default function PaymentModal({
       if (fiscalState !== 'idle') {
         if (fiscalState === 'success') {
           const actions = ['close', 'print', 'email'];
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          if (
+            e.key === 'ArrowRight' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowUp'
+          ) {
             e.preventDefault();
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
               setFocusedActionIndex((prev) => Math.min(prev + 1, actions.length - 1));
-            else
-              setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
+            else setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
             return;
           }
           if (e.key === 'Enter') {
@@ -73,17 +77,29 @@ export default function PaymentModal({
         }
         if (fiscalState === 'failed') {
           const actions = ['retry', 'skip'];
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          if (
+            e.key === 'ArrowRight' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowUp'
+          ) {
             e.preventDefault();
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
               setFocusedActionIndex((prev) => Math.min(prev + 1, actions.length - 1));
-            else
-              setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
+            else setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
             return;
           }
           if (e.key === 'Enter') {
             e.preventDefault();
-            if (focusedActionIndex === 0) handleConfirm(activeTab === 'dinheiro' ? 'dinheiro' : activeTab === 'pix' ? 'pix' : 'cartao_credito', currentSaleId!);
+            if (focusedActionIndex === 0)
+              handleConfirm(
+                activeTab === 'dinheiro'
+                  ? 'dinheiro'
+                  : activeTab === 'pix'
+                    ? 'pix'
+                    : 'cartao_credito',
+                currentSaleId!,
+              );
             if (focusedActionIndex === 1) handleSkipFiscal();
             return;
           }
@@ -132,9 +148,21 @@ export default function PaymentModal({
           }
           return;
         }
-        if (e.key === '1') { e.preventDefault(); setActiveTab('dinheiro'); return; }
-        if (e.key === '2') { e.preventDefault(); setActiveTab('pix'); return; }
-        if (e.key === '3') { e.preventDefault(); setActiveTab('cartao'); return; }
+        if (e.key === '1') {
+          e.preventDefault();
+          setActiveTab('dinheiro');
+          return;
+        }
+        if (e.key === '2') {
+          e.preventDefault();
+          setActiveTab('pix');
+          return;
+        }
+        if (e.key === '3') {
+          e.preventDefault();
+          setActiveTab('cartao');
+          return;
+        }
       }
 
       if (e.key === 'Enter') {
@@ -223,12 +251,18 @@ export default function PaymentModal({
         {fiscalState === 'idle' ? (
           <>
             {/* Lado Esquerdo - Totais e Métodos */}
-            <div className={`w-full md:w-1/3 bg-[#0a111f] p-8 border-r border-[#1B2A5E] flex flex-col min-h-[480px] h-[480px] ${focusedPanel === 'methods' ? 'ring-2 ring-[#C9A227] rounded-l-2xl' : ''}`}>
+            <div
+              className={`w-full md:w-1/3 bg-[#0a111f] p-8 border-r border-[#1B2A5E] flex flex-col min-h-[480px] h-[480px] ${focusedPanel === 'methods' ? 'ring-2 ring-[#C9A227] rounded-l-2xl' : ''}`}
+            >
               <div className="flex gap-2 mb-4">
-                <span className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'methods' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}>
+                <span
+                  className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'methods' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}
+                >
                   MÉTODOS
                 </span>
-                <span className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'content' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}>
+                <span
+                  className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'content' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}
+                >
                   VALOR
                 </span>
               </div>
@@ -265,7 +299,9 @@ export default function PaymentModal({
             </div>
 
             {/* Lado Direito - Conteúdo da Aba */}
-            <div className={`w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-[#0f1932] border-t md:border-t-0 md:border-l border-[#1B2A5E] min-h-[480px] h-[480px] ${focusedPanel === 'content' ? 'ring-2 ring-[#C9A227] rounded-r-2xl' : ''}`}>
+            <div
+              className={`w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-[#0f1932] border-t md:border-t-0 md:border-l border-[#1B2A5E] min-h-[480px] h-[480px] ${focusedPanel === 'content' ? 'ring-2 ring-[#C9A227] rounded-r-2xl' : ''}`}
+            >
               {activeTab === 'dinheiro' && (
                 <div className="w-full max-w-md flex flex-col items-center space-y-8">
                   <div className="w-full">

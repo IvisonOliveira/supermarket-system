@@ -54,12 +54,9 @@ export function startSyncService() {
       }
 
       // 2. Atualiza Produtos Locais
-      const prodRes = await fetch(
-        `${API_URL}/products?limit=200&active=true`,
-        {
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        }
-      );
+      const prodRes = await fetch(`${API_URL}/products?limit=200&active=true`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      });
       let updatedProductsCount = 0;
       if (prodRes.ok) {
         const json = (await prodRes.json()) as any;

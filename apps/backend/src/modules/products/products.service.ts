@@ -17,7 +17,7 @@ export class ProductsService {
   constructor(
     private readonly supabase: SupabaseConfig,
     private readonly ibptService: IbptService,
-  ) { }
+  ) {}
 
   async create(dto: CreateProductDto): Promise<any> {
     if (dto.barcode) {

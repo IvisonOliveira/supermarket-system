@@ -9,7 +9,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly supabase: SupabaseConfig,
     private readonly reflector: Reflector,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [

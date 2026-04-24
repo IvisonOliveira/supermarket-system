@@ -27,7 +27,6 @@ export default function Login({ onLogin }: Props) {
   return (
     <div className="flex h-screen bg-[#0a111f] text-white items-center justify-center">
       <div className="w-full max-w-sm p-10 bg-[#0f1932] rounded-2xl border border-[#1B2A5E] shadow-[0_0_60px_rgba(201,162,39,0.08)] flex flex-col items-center">
-
         <img
           src="/logos/OmniMarket-Dark-Transparent.png"
           alt="OmniMarket"
@@ -73,9 +72,7 @@ export default function Login({ onLogin }: Props) {
           {loading ? 'ENTRANDO...' : 'ENTRAR'}
         </button>
 
-        <p className="text-slate-700 text-xs font-mono mt-8 tracking-widest">
-          OMNIMARKET PDV
-        </p>
+        <p className="text-slate-700 text-xs font-mono mt-8 tracking-widest">OMNIMARKET PDV</p>
       </div>
     </div>
   );
