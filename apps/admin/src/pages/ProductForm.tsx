@@ -73,7 +73,7 @@ export default function ProductForm() {
         .get(`/products/${id}`, {
           headers: {
             'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
+            Pragma: 'no-cache',
           },
         })
         .then((res) => {
