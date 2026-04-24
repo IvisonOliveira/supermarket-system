@@ -14,7 +14,7 @@ const productSchema = z.object({
   category_id: z.string().optional().or(z.literal('')),
   price: z.coerce.number().min(0, 'O preço longo deve ser maior ou igual a zero'),
   cost: z.coerce.number().min(0, 'O custo deve ser maior ou igual a zero'),
-  unit: z.enum(['un', 'kg', 'l']),
+  unit: z.enum(['UN', 'KG', 'LT', 'CX']),
   ncm: z.string().optional(),
   stock_qty: z.coerce.number().min(0, 'O estoque não pode ser negativo'),
   stock_min: z.coerce.number().min(0, 'O estoque mínimo não pode ser negativo'),
@@ -49,7 +49,7 @@ export default function ProductForm() {
       category_id: '',
       price: 0,
       cost: 0,
-      unit: 'un',
+      unit: 'UN',
       ncm: '',
       stock_qty: 0,
       stock_min: 0,
@@ -79,7 +79,7 @@ export default function ProductForm() {
             category_id: product.category_id || '',
             price: product.price,
             cost: product.cost || 0,
-            unit: product.unit || 'un',
+            unit: product.unit || 'UN',
             ncm: product.ncm || '',
             stock_qty: product.stock_qty || 0,
             stock_min: product.stock_min || 0,
@@ -263,9 +263,10 @@ export default function ProductForm() {
               error={errors.unit?.message}
               {...register('unit')}
               options={[
-                { value: 'un', label: 'Unidade (UN)' },
-                { value: 'kg', label: 'Quilo (KG)' },
-                { value: 'l', label: 'Litro (L)' },
+                { value: 'UN', label: 'UN/Unidade' },
+                { value: 'KG', label: 'KG/Quilo' },
+                { value: 'LT', label: 'LT/Litro' },
+                { value: 'CX', label: 'CX/Caixa' },
               ]}
             />
           </div>

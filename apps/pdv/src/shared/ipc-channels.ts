@@ -8,6 +8,12 @@
 // ── Nomes de canal ──────────────────────────────────────────────────────────
 
 export const IPC = {
+  // Auth
+  AUTH_LOGIN: 'auth:login',
+  AUTH_LOGOUT: 'auth:logout',
+  AUTH_GET_TOKEN: 'auth:get-token',
+  AUTH_GET_USER: 'auth:get-user',
+
   // Banco de dados local (SQLite)
   DB_GET_PRODUCTS: 'db:getProducts',
   DB_SEARCH_PRODUCTS: 'db:searchProducts',
@@ -65,6 +71,12 @@ export interface ReceiptData {
 // ── Interface da API exposta pelo preload ───────────────────────────────────
 
 export interface ElectronAPI {
+  auth: {
+    login: (email: string, password: string) => Promise<{ token: string; user: any }>;
+    logout: () => Promise<void>;
+    getToken: () => Promise<string | null>;
+    getUser: () => Promise<any | null>;
+  };
   db: {
     getProducts: () => Promise<Product[]>;
     searchProducts: (query: string) => Promise<Product[]>;

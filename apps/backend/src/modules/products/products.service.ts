@@ -17,7 +17,7 @@ export class ProductsService {
   constructor(
     private readonly supabase: SupabaseConfig,
     private readonly ibptService: IbptService,
-  ) {}
+  ) { }
 
   async create(dto: CreateProductDto): Promise<any> {
     if (dto.barcode) {
@@ -45,40 +45,38 @@ export class ProductsService {
   }
 
   async findAll(filters: ProductFilterDto): Promise<any> {
-    const { page = 1, limit = 20, category_id, name, barcode, active } = filters;
-    const offset = (page - 1) * limit;
+    try {
+      const { page = 1, limit = 20, category_id, name, barcode, active } = filters;
+      const offset = (page - 1) * limit;
 
-    let query = this.supabase.serviceClient
-      .from('products')
-      .select('*, categories(name)', { count: 'exact' });
+      let query = this.supabase.serviceClient
+        .from('products')
+        .select('*, categories(name)', { count: 'exact' });
 
-    if (category_id) {
-      query = query.eq('category_id', category_id);
-    }
-    if (name) {
-      query = query.ilike('name', `%${name}%`);
-    }
-    if (barcode) {
-      query = query.eq('barcode', barcode);
-    }
-    if (active !== undefined) {
-      query = query.eq('active', active);
-    }
+      if (category_id) query = query.eq('category_id', category_id);
+      if (name) query = query.ilike('name', `%${name}%`);
+      if (barcode) query = query.eq('barcode', barcode);
+      if (active !== undefined) query = query.eq('active', active);
 
-    const { data, error, count } = await query
-      .range(offset, offset + limit - 1)
-      .order('created_at', { ascending: false });
+      const { data, error, count } = await query
+        .range(offset, offset + limit - 1)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error) {
+        console.error('PRODUCTS FINDALL ERROR:', JSON.stringify(error, null, 2));
+        throw new InternalServerErrorException(error.message);
+      }
+
+      return {
+        data,
+        total: count || 0,
+        page,
+        totalPages: count ? Math.ceil(count / limit) : 0,
+      };
+    } catch (err) {
+      console.error('PRODUCTS FINDALL EXCEPTION:', err);
+      throw err;
     }
-
-    return {
-      data,
-      total: count || 0,
-      page,
-      totalPages: count ? Math.ceil(count / limit) : 0,
-    };
   }
 
   async findById(id: string): Promise<any> {

@@ -34,7 +34,7 @@ export default function Login() {
       const response = await api.post('/auth/login', data);
       const { user, token } = response.data;
       login(user, token);
-      navigate('/');
+      setTimeout(() => navigate('/'), 50);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage =

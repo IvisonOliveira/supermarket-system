@@ -13,6 +13,8 @@ export interface SaleItem extends Product {
 export default function PDV() {
   const [items, setItems] = useState<SaleItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
+  const [discountPct, setDiscountPct] = useState<number>(0);
+  const [discountFocus, setDiscountFocus] = useState<'value' | 'pct'>('value');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -82,6 +84,7 @@ export default function PDV() {
   const clearSale = () => {
     setItems([]);
     setDiscount(0);
+    setDiscountPct(0);
     setSearchQuery('');
     setSearchResults([]);
     setSelectedIndex(0);
@@ -93,6 +96,18 @@ export default function PDV() {
   const calculateTotal = () => {
     const sub = items.reduce((acc, item) => acc + item.subtotal, 0);
     return Math.max(0, sub - discount);
+  };
+
+  const handleDiscountValueChange = (value: number) => {
+    const sub = items.reduce((acc, item) => acc + item.subtotal, 0);
+    setDiscount(value);
+    setDiscountPct(sub > 0 ? Number(((value / sub) * 100).toFixed(2)) : 0);
+  };
+
+  const handleDiscountPctChange = (pct: number) => {
+    const sub = items.reduce((acc, item) => acc + item.subtotal, 0);
+    setDiscountPct(pct);
+    setDiscount(Number(((pct / 100) * sub).toFixed(2)));
   };
 
   // ─── Efeitos ─────────────────────────────────────────────────────────────
@@ -189,7 +204,13 @@ export default function PDV() {
       // F3 — foca campo de desconto (sem window.prompt)
       if (e.key === 'F3') {
         e.preventDefault();
-        document.getElementById('discount')?.focus();
+        if (discountFocus === 'value') {
+          setDiscountFocus('pct');
+          setTimeout(() => document.getElementById('discount-pct')?.focus(), 10);
+        } else {
+          setDiscountFocus('value');
+          setTimeout(() => document.getElementById('discount')?.focus(), 10);
+        }
         return;
       }
 
@@ -277,6 +298,7 @@ export default function PDV() {
     editingQtyIndex,
     searchNavIndex,
     cartNavMode,
+    discountFocus,
   ]);
 
   // Scroll automático — item do carrinho selecionado
@@ -325,11 +347,10 @@ export default function PDV() {
               <div
                 id={`item-${index}`}
                 key={`${item.id}-${index}`}
-                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${
-                  index === selectedIndex
+                className={`flex justify-between items-center p-4 rounded-lg text-lg shadow-sm border transition-all ${index === selectedIndex
                     ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                     : 'bg-[#152248] border-[#1B2A5E]'
-                }`}
+                  }`}
               >
                 <div className="flex-1 pr-4">
                   <span className="text-white block text-2xl font-bold truncate">{item.name}</span>
@@ -349,11 +370,11 @@ export default function PDV() {
                               prev.map((it, i) =>
                                 i === index
                                   ? {
-                                      ...it,
-                                      quantity: weight,
-                                      subtotal: weight * it.price,
-                                      isWeighing: false,
-                                    }
+                                    ...it,
+                                    quantity: weight,
+                                    subtotal: weight * it.price,
+                                    isWeighing: false,
+                                  }
                                   : it,
                               ),
                             );
@@ -433,25 +454,47 @@ export default function PDV() {
                   {items.reduce((acc, i) => acc + i.quantity, 0)}
                 </span>
               </p>
-              <div className="flex items-center mt-4 group">
-                <label htmlFor="discount" className="text-2xl text-slate-400">
-                  Desconto: <span className="text-white">R$</span>
-                </label>
-                <input
-                  id="discount"
-                  type="number"
-                  className="bg-transparent border-b-2 border-[#1B2A5E] text-3xl font-bold ml-3 w-32 outline-none focus:border-[#C9A227] group-hover:border-slate-500 transition-colors pt-1"
-                  value={discount || ''}
-                  onChange={(e) => setDiscount(Number(e.target.value) || 0)}
-                  onKeyDown={(e) => {
-                    // Enter ou Escape no campo de desconto volta ao input de busca
-                    if (e.key === 'Enter' || e.key === 'Escape') {
-                      e.preventDefault();
-                      searchInputRef.current?.focus();
-                    }
-                  }}
-                  placeholder="0.00"
-                />
+              <div className="flex items-center gap-4 mt-4">
+                <label className="text-2xl text-slate-400 whitespace-nowrap">Desconto:</label>
+                <div className="flex items-center group">
+                  <span className="text-white text-2xl mr-1">R$</span>
+                  <input
+                    id="discount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="bg-transparent border-b-2 border-[#1B2A5E] text-3xl font-bold w-28 outline-none focus:border-[#C9A227] group-hover:border-slate-500 transition-colors pt-1"
+                    value={discount || ''}
+                    onChange={(e) => handleDiscountValueChange(Number(e.target.value) || 0)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === 'Escape') {
+                        e.preventDefault();
+                        searchInputRef.current?.focus();
+                      }
+                    }}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="flex items-center group">
+                  <span className="text-slate-400 text-2xl mr-1">%</span>
+                  <input
+                    id="discount-pct"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    className="bg-transparent border-b-2 border-[#1B2A5E] text-3xl font-bold w-20 outline-none focus:border-[#C9A227] group-hover:border-slate-500 transition-colors pt-1"
+                    value={discountPct || ''}
+                    onChange={(e) => handleDiscountPctChange(Number(e.target.value) || 0)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === 'Escape') {
+                        e.preventDefault();
+                        searchInputRef.current?.focus();
+                      }
+                    }}
+                    placeholder="0.0"
+                  />
+                </div>
               </div>
             </div>
             <div className="text-right">
@@ -517,11 +560,10 @@ export default function PDV() {
                     id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className={`w-full text-left p-5 rounded-lg mb-3 transition-colors flex justify-between items-center outline-none border group ${
-                      searchNavIndex === idx
+                    className={`w-full text-left p-5 rounded-lg mb-3 transition-colors flex justify-between items-center outline-none border group ${searchNavIndex === idx
                         ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                         : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
-                    }`}
+                      }`}
                   >
                     <div>
                       <div className="text-2xl font-bold text-slate-100 group-hover:text-white truncate max-w-[280px]">
@@ -552,11 +594,10 @@ export default function PDV() {
                     id={`result-${idx}`}
                     key={p.id}
                     onClick={() => addItem(p)}
-                    className={`p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border active:scale-95 group ${
-                      searchNavIndex === idx
+                    className={`p-5 rounded-lg flex flex-col items-center justify-between aspect-square transition-colors shadow border active:scale-95 group ${searchNavIndex === idx
                         ? 'bg-[#1B2A5E] border-[#C9A227] ring-2 ring-[#C9A227]/40'
                         : 'bg-[#0f1932] hover:bg-[#1B2A5E] border-[#1B2A5E] hover:border-[#C9A227]'
-                    }`}
+                      }`}
                   >
                     <span className="text-center w-full mb-3 text-xl font-semibold text-slate-300 group-hover:text-white line-clamp-3 leading-snug">
                       {p.name}
@@ -582,7 +623,7 @@ export default function PDV() {
         <p className="text-slate-600 text-xs font-mono font-medium tracking-wide text-center">
           <span className="text-[#C9A227] font-bold ml-3">F1</span> Busca |
           <span className="text-[#C9A227] font-bold ml-3">F2</span> Qtd |
-          <span className="text-[#C9A227] font-bold ml-3">F3</span> Desc |
+          <span className="text-[#C9A227] font-bold ml-3">F3</span> Desc R$/% |
           <span className="text-[#C9A227] font-bold ml-3">F5</span> Pagar |
           <span className="text-[#C9A227] font-bold ml-3">F8</span> Cancelar |
           <span className="text-[#C9A227] font-bold ml-3">Del/F4</span> Remover |

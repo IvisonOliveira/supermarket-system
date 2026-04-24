@@ -34,7 +34,7 @@ export default function FiscalSettings() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/fiscal/certificate');
+      const res = await api.get('/fiscal/certificate/status');
       setData(res.data);
     } catch (err) {
       console.error('Erro ao buscar dados fiscais', err);

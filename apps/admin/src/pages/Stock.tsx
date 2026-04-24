@@ -56,7 +56,7 @@ export default function Stock() {
   const loadPositions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/stock');
+      const res = await api.get('/stock/low');
       const dataPos = res.data?.items ?? res.data;
       setPositions(Array.isArray(dataPos) ? dataPos : []);
     } catch (err) {

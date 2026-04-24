@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -22,8 +22,8 @@ export class CreateProductDto {
   @IsOptional()
   cost?: number;
 
-  @ApiProperty({ enum: ['un', 'kg', 'l'] })
-  @IsIn(['un', 'kg', 'l'])
+  @ApiProperty({ enum: ['UN', 'KG', 'LT', 'CX'] })
+  @IsIn(['UN', 'KG', 'LT', 'CX'])
   unit: string;
 
   @ApiPropertyOptional()
@@ -57,4 +57,9 @@ export class CreateProductDto {
   @Min(0)
   @IsOptional()
   stock_min: number = 0;
+
+  @ApiPropertyOptional({ default: true })
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean = true;
 }

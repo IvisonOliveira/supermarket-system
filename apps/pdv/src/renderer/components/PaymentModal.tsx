@@ -24,6 +24,8 @@ export default function PaymentModal({
   discount,
 }: PaymentModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('dinheiro');
+  const [focusedPanel, setFocusedPanel] = useState<'methods' | 'content'>('methods');
+  const [focusedActionIndex, setFocusedActionIndex] = useState<number>(0);
   const [receivedAmount, setReceivedAmount] = useState<number>(0);
   const receivedInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,44 +42,104 @@ export default function PaymentModal({
       setReceivedAmount(0);
       setFiscalState('idle');
       setCurrentSaleId(null);
-      setTimeout(() => receivedInputRef.current?.focus(), 100);
+      setFocusedActionIndex(0);
+      setFocusedPanel('methods');
     }
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen || fiscalState !== 'idle') return;
+    if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // ── Telas pós-confirmação (emitting/success/failed) ──
+      if (fiscalState !== 'idle') {
+        if (fiscalState === 'success') {
+          const actions = ['close', 'print', 'email'];
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
+              setFocusedActionIndex((prev) => Math.min(prev + 1, actions.length - 1));
+            else
+              setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
+            return;
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (focusedActionIndex === 0) onSuccess();
+            if (focusedActionIndex === 1) alert('Simulando impressão...');
+            if (focusedActionIndex === 2) alert('Simulando envio de email...');
+            return;
+          }
+        }
+        if (fiscalState === 'failed') {
+          const actions = ['retry', 'skip'];
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
+              setFocusedActionIndex((prev) => Math.min(prev + 1, actions.length - 1));
+            else
+              setFocusedActionIndex((prev) => Math.max(prev - 1, 0));
+            return;
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (focusedActionIndex === 0) handleConfirm(activeTab === 'dinheiro' ? 'dinheiro' : activeTab === 'pix' ? 'pix' : 'cartao_credito', currentSaleId!);
+            if (focusedActionIndex === 1) handleSkipFiscal();
+            return;
+          }
+        }
+        return;
+      }
+
+      // ── Tela idle ──
       if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
         return;
       }
 
-      const activeElement = document.activeElement;
-      const isInputFocused = activeElement?.tagName === 'INPUT';
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        setFocusedPanel((prev) => {
+          const next = prev === 'methods' ? 'content' : 'methods';
+          if (next === 'content') {
+            setTimeout(() => {
+              const input = receivedInputRef.current;
+              if (input) {
+                input.focus();
+                input.select();
+              }
+            }, 50);
+          } else receivedInputRef.current?.blur();
+          return next;
+        });
+        return;
+      }
 
-      if (!isInputFocused) {
-        if (e.key === '1') {
+      if (focusedPanel === 'methods') {
+        if (e.key === 'ArrowDown') {
           e.preventDefault();
-          setActiveTab('dinheiro');
-          setTimeout(() => receivedInputRef.current?.focus(), 100);
+          if (activeTab === 'dinheiro') setActiveTab('pix');
+          else if (activeTab === 'pix') setActiveTab('cartao');
+          return;
         }
-        if (e.key === '2') {
+        if (e.key === 'ArrowUp') {
           e.preventDefault();
-          setActiveTab('pix');
+          if (activeTab === 'cartao') setActiveTab('pix');
+          else if (activeTab === 'pix') {
+            setActiveTab('dinheiro');
+            setTimeout(() => receivedInputRef.current?.focus(), 50);
+          }
+          return;
         }
-        if (e.key === '3') {
-          e.preventDefault();
-          setActiveTab('cartao');
-        }
+        if (e.key === '1') { e.preventDefault(); setActiveTab('dinheiro'); return; }
+        if (e.key === '2') { e.preventDefault(); setActiveTab('pix'); return; }
+        if (e.key === '3') { e.preventDefault(); setActiveTab('cartao'); return; }
       }
 
       if (e.key === 'Enter') {
         e.preventDefault();
-        const changeValue = Math.max(0, receivedAmount - total);
         const isValid = receivedAmount >= total;
-
         if (activeTab === 'dinheiro' && isValid) handleConfirm('dinheiro');
         if (activeTab === 'pix') handleConfirm('pix');
         if (activeTab === 'cartao') handleConfirm('cartao_credito');
@@ -86,7 +148,7 @@ export default function PaymentModal({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, activeTab, receivedAmount, total]);
+  }, [isOpen, activeTab, receivedAmount, total, fiscalState, focusedPanel, focusedActionIndex]);
 
   if (!isOpen) return null;
 
@@ -161,7 +223,15 @@ export default function PaymentModal({
         {fiscalState === 'idle' ? (
           <>
             {/* Lado Esquerdo - Totais e Métodos */}
-            <div className="w-full md:w-1/3 bg-[#0a111f] p-8 border-r border-[#1B2A5E] flex flex-col">
+            <div className={`w-full md:w-1/3 bg-[#0a111f] p-8 border-r border-[#1B2A5E] flex flex-col min-h-[480px] h-[480px] ${focusedPanel === 'methods' ? 'ring-2 ring-[#C9A227] rounded-l-2xl' : ''}`}>
+              <div className="flex gap-2 mb-4">
+                <span className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'methods' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}>
+                  MÉTODOS
+                </span>
+                <span className={`text-xs font-bold tracking-widest px-3 py-1 rounded-full border transition-all ${focusedPanel === 'content' ? 'bg-[#C9A227] text-[#0f1932] border-[#C9A227]' : 'text-slate-600 border-slate-700'}`}>
+                  VALOR
+                </span>
+              </div>
               <h2 className="text-2xl text-slate-400 font-bold tracking-widest mb-2">
                 TOTAL DA VENDA
               </h2>
@@ -195,7 +265,7 @@ export default function PaymentModal({
             </div>
 
             {/* Lado Direito - Conteúdo da Aba */}
-            <div className="w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-[#0f1932] border-t md:border-t-0 md:border-l border-[#1B2A5E]">
+            <div className={`w-full md:w-2/3 p-8 flex flex-col items-center justify-center bg-[#0f1932] border-t md:border-t-0 md:border-l border-[#1B2A5E] min-h-[480px] h-[480px] ${focusedPanel === 'content' ? 'ring-2 ring-[#C9A227] rounded-r-2xl' : ''}`}>
               {activeTab === 'dinheiro' && (
                 <div className="w-full max-w-md flex flex-col items-center space-y-8">
                   <div className="w-full">
@@ -214,6 +284,23 @@ export default function PaymentModal({
                         className="w-full bg-[#152248] border-2 border-[#1B2A5E] rounded-xl text-5xl font-black py-6 pl-20 pr-6 outline-none focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/30 transition-colors shadow-inner text-center"
                         value={receivedAmount || ''}
                         onChange={(e) => setReceivedAmount(Number(e.target.value) || 0)}
+                        onKeyDown={(e) => {
+                          // Permite digitação direta pelo teclado numérico
+                          if (e.key >= '0' && e.key <= '9') {
+                            e.preventDefault();
+                            setReceivedAmount((prev) => {
+                              const str = (prev * 100).toFixed(0) + e.key;
+                              return Number(str) / 100;
+                            });
+                          }
+                          if (e.key === 'Backspace') {
+                            e.preventDefault();
+                            setReceivedAmount((prev) => {
+                              const str = (prev * 100).toFixed(0).slice(0, -1) || '0';
+                              return Number(str) / 100;
+                            });
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -238,7 +325,7 @@ export default function PaymentModal({
               )}
 
               {activeTab === 'pix' && (
-                <div className="w-full max-w-md flex flex-col items-center space-y-10">
+                <div className="w-full max-w-md flex flex-col items-center justify-center h-full space-y-10">
                   <div className="w-64 h-64 bg-[#152248] border-4 border-dashed border-[#1B2A5E] rounded-2xl flex items-center justify-center p-4">
                     <p className="text-center text-slate-400 text-xl font-medium">
                       QR Code será exibido aqui
@@ -258,7 +345,7 @@ export default function PaymentModal({
               )}
 
               {activeTab === 'cartao' && (
-                <div className="w-full max-w-md flex flex-col items-center space-y-10">
+                <div className="w-full max-w-md flex flex-col items-center justify-center h-full space-y-10">
                   <div className="w-full py-16 bg-[#152248] border border-[#1B2A5E] rounded-2xl flex flex-col items-center justify-center shadow-inner">
                     <svg
                       className="w-20 h-20 text-slate-600 mb-6"
@@ -323,19 +410,19 @@ export default function PaymentModal({
                 <div className="flex gap-4 w-full">
                   <button
                     onClick={onSuccess}
-                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
+                    className={`flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all ${focusedActionIndex === 0 ? 'ring-2 ring-[#C9A227]' : ''}`}
                   >
                     Fechar
                   </button>
                   <button
                     onClick={() => alert('Simulando impressão...')}
-                    className={`flex-1 py-4 text-base ${btnGold}`}
+                    className={`flex-1 py-4 text-base ${btnGold} ${focusedActionIndex === 1 ? 'ring-2 ring-[#C9A227]' : ''}`}
                   >
                     Imprimir Cupom
                   </button>
                   <button
                     onClick={() => alert('Simulando envio de email...')}
-                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
+                    className={`flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all ${focusedActionIndex === 2 ? 'ring-2 ring-[#C9A227]' : ''}`}
                   >
                     Enviar Email
                   </button>
@@ -363,13 +450,13 @@ export default function PaymentModal({
                 <div className="flex gap-4 w-full">
                   <button
                     onClick={() => handleConfirm(activeTab, currentSaleId!)}
-                    className={`flex-1 py-4 text-base ${btnGold}`}
+                    className={`flex-1 py-4 text-base ${btnGold} ${focusedActionIndex === 0 ? 'ring-2 ring-[#C9A227]' : ''}`}
                   >
                     Tentar Novamente
                   </button>
                   <button
                     onClick={handleSkipFiscal}
-                    className="flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all"
+                    className={`flex-1 bg-[#152248] hover:bg-[#1B2A5E] border border-[#1B2A5E] text-white font-bold py-4 rounded-xl transition-all ${focusedActionIndex === 1 ? 'ring-2 ring-[#C9A227]' : ''}`}
                   >
                     Continuar sem NF
                   </button>

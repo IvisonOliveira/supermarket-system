@@ -40,7 +40,7 @@ export class ProductsController {
     private readonly productsService: ProductsService,
     private readonly ibptService: IbptService,
     private readonly csvImportService: CsvImportService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({ summary: 'Listar produtos com paginação e filtros' })
@@ -54,16 +54,16 @@ export class ProductsController {
     return this.productsService.findByBarcode(barcode);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Buscar produto por ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.findById(id);
-  }
-
   @Get('taxes/:ncm')
   @ApiOperation({ summary: 'Consultar impostos no IBPT por NCM' })
   getTaxes(@Param('ncm') ncm: string) {
     return this.ibptService.getAliquotas(ncm);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Buscar produto por ID' })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.findById(id);
   }
 
   @Post()

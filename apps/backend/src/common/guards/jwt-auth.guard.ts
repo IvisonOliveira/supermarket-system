@@ -9,7 +9,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly supabase: SupabaseConfig,
     private readonly reflector: Reflector,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -44,7 +44,17 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Token invalido ou expirado');
     }
 
-    request.user = data.user;
+    const { data: profile } = await this.supabase.serviceClient
+      .from('users')
+      .select('id, name, role, active')
+      .eq('id', data.user.id)
+      .single();
+
+    if (!profile || !profile.active) {
+      throw new UnauthorizedException('Usuario inativo ou não encontrado');
+    }
+
+    request.user = { ...data.user, ...profile };
     return true;
   }
 }

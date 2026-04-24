@@ -1,8 +1,8 @@
 import path from 'path';
-
 import { app, BrowserWindow, ipcMain } from 'electron';
-
 import { registerIpcHandlers } from './ipc-handlers';
+import { startSyncService } from './sync-service';
+import { initAuthHandlers } from './auth';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -25,11 +25,10 @@ function createWindow(): void {
   }
 }
 
-import { startSyncService } from './sync-service';
-
 app
   .whenReady()
   .then(() => {
+    initAuthHandlers();
     registerIpcHandlers(ipcMain);
     createWindow();
     startSyncService();

@@ -1,7 +1,14 @@
 import { getPendingSales, markSaleSynced, upsertProducts } from './database';
 
+import { getAuthToken } from './auth';
+
+function getAuthHeaders(): Record<string, string> {
+  const token = getAuthToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 let syncInterval: NodeJS.Timeout | null = null;
-const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api'; // backend route prefix
+const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api/v1'; // backend route prefix
 let lastSyncTime = new Date(0).toISOString();
 
 export function startSyncService() {
@@ -9,13 +16,9 @@ export function startSyncService() {
 
   syncInterval = setInterval(async () => {
     try {
-      // 1. Testa conectividade
-      const healthRes = await fetch(`${API_URL}/health`).catch(() => null);
-      if (!healthRes || !healthRes.ok) {
-        return; // Offline
-      }
-
-      // 2. Sincroniza Vendas Pendentes
+      // Não sincroniza se não houver token
+      if (!getAuthToken()) return;
+      // 1. Sincroniza Vendas Pendentes
       const pendingSales = getPendingSales();
       if (pendingSales.length > 0) {
         const payload = {
@@ -36,7 +39,7 @@ export function startSyncService() {
 
         const syncRes = await fetch(`${API_URL}/sales/sync`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify(payload),
         });
 
@@ -50,14 +53,18 @@ export function startSyncService() {
         }
       }
 
-      // 3. Atualiza Produtos Locais
+      // 2. Atualiza Produtos Locais
       const prodRes = await fetch(
-        `${API_URL}/products?updated_after=${encodeURIComponent(lastSyncTime)}`,
+        `${API_URL}/products?limit=200&active=true`,
+        {
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        }
       );
       let updatedProductsCount = 0;
       if (prodRes.ok) {
-        const updatedProducts = (await prodRes.json()) as any[];
-        if (updatedProducts && updatedProducts.length > 0) {
+        const json = (await prodRes.json()) as any;
+        const updatedProducts = json.data ?? [];
+        if (updatedProducts.length > 0) {
           upsertProducts(updatedProducts);
           updatedProductsCount = updatedProducts.length;
         }

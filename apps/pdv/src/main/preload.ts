@@ -5,6 +5,13 @@ import type { ElectronAPI, SaleData, ReceiptData } from '../shared/ipc-channels'
 
 // Nunca expor o ipcRenderer diretamente — usar contextBridge com API restrita.
 const api: ElectronAPI = {
+  auth: {
+    login: (email: string, password: string) =>
+      ipcRenderer.invoke(IPC.AUTH_LOGIN, email, password),
+    logout: () => ipcRenderer.invoke(IPC.AUTH_LOGOUT),
+    getToken: () => ipcRenderer.invoke(IPC.AUTH_GET_TOKEN),
+    getUser: () => ipcRenderer.invoke(IPC.AUTH_GET_USER),
+  },
   db: {
     getProducts: () => ipcRenderer.invoke(IPC.DB_GET_PRODUCTS),
     searchProducts: (query: string) => ipcRenderer.invoke(IPC.DB_SEARCH_PRODUCTS, query),
