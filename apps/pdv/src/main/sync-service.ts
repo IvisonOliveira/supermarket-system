@@ -1,6 +1,6 @@
 import { getPendingSales, markSaleSynced, upsertProducts } from './database';
 
-import { getAuthToken } from './auth';
+import { getAuthToken, getCashierSessionId, setCashierSessionId, CASHIER_ID } from './auth';
 
 function getAuthHeaders(): Record<string, string> {
   const token = getAuthToken();
@@ -11,6 +11,33 @@ let syncInterval: NodeJS.Timeout | null = null;
 const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api/v1'; // backend route prefix
 let lastSyncTime = new Date(0).toISOString();
 
+async function ensureCashierSession() {
+  const currentRes = await fetch(`${API_URL}/cashier/current`, {
+    headers: { ...getAuthHeaders() },
+  });
+  if (!currentRes.ok) throw new Error('Falha ao buscar sessão atual do caixa');
+
+  const sessionText = await currentRes.text();
+  const session = sessionText ? JSON.parse(sessionText) : null;
+
+  if (session && session.id) {
+    setCashierSessionId(session.id);
+    return;
+  }
+
+  const openRes = await fetch(`${API_URL}/cashier/open`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ cashier_id: CASHIER_ID, opening_amount: 0 }),
+  });
+
+  if (!openRes.ok) throw new Error('Falha ao abrir nova sessão de caixa');
+  const newSession = await openRes.json();
+  if (newSession && newSession.id) {
+    setCashierSessionId(newSession.id);
+  }
+}
+
 export function startSyncService() {
   if (syncInterval) return;
 
@@ -18,13 +45,14 @@ export function startSyncService() {
     try {
       // Não sincroniza se não houver token
       if (!getAuthToken()) return;
+      if (!getCashierSessionId()) await ensureCashierSession();
       // 1. Sincroniza Vendas Pendentes
       const pendingSales = getPendingSales();
       if (pendingSales.length > 0) {
         const payload = {
           sales: pendingSales.map((s: any) => ({
             id: s.id,
-            cashier_session_id: '00000000-0000-0000-0000-000000000000', // Mock - PDV setup needed
+            cashier_session_id: getCashierSessionId(),
             items: s.items.map((i: any) => ({
               product_id: i.product_id || i.id,
               qty: i.qty || i.quantity,
