@@ -16,7 +16,7 @@ async function ensureCashierSession() {
     headers: { ...getAuthHeaders() },
   });
   if (!currentRes.ok) throw new Error('Falha ao buscar sessão atual do caixa');
-  
+
   const sessionText = await currentRes.text();
   const session = sessionText ? JSON.parse(sessionText) : null;
 
@@ -30,7 +30,7 @@ async function ensureCashierSession() {
     headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ cashier_id: CASHIER_ID, opening_amount: 0 }),
   });
-  
+
   if (!openRes.ok) throw new Error('Falha ao abrir nova sessão de caixa');
   const newSession = await openRes.json();
   if (newSession && newSession.id) {

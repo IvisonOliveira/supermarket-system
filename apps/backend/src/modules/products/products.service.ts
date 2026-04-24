@@ -67,13 +67,14 @@ export class ProductsService {
         throw new InternalServerErrorException(error.message);
       }
 
-      const formattedData = data?.map((p: any) => {
-        const { categories, ...rest } = p;
-        return {
-          ...rest,
-          category_name: categories?.name || null,
-        };
-      }) || [];
+      const formattedData =
+        data?.map((p: any) => {
+          const { categories, ...rest } = p;
+          return {
+            ...rest,
+            category_name: categories?.name || null,
+          };
+        }) || [];
 
       return {
         data: formattedData,
