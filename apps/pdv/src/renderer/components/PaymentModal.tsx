@@ -76,7 +76,7 @@ export default function PaymentModal({
           }
         }
         if (fiscalState === 'failed') {
-          const actions = ['retry', 'skip'];
+          const actions = ['retry', 'skip']; // skip
           if (
             e.key === 'ArrowRight' ||
             e.key === 'ArrowDown' ||

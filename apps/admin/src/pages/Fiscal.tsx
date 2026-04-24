@@ -152,7 +152,7 @@ export default function Fiscal() {
           </Button>
           {nf.status === 'authorized' && canBeCancelled(nf.data) && (
             <Button size="sm" variant="danger" onClick={() => handleOpenCancelModal(nf.id)}>
-              Cancelar
+               Cancelar
             </Button>
           )}
         </div>

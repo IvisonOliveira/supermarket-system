@@ -23,7 +23,7 @@ import { scaleReader } from './scale-reader';
 export function registerIpcHandlers(ipcMain: IpcMain): void {
   // Inicializa o leitor de código de barras global
   initBarcodeDetector();
-  // ── Banco de dados (SQLite via better-sqlite3) ────────────────────────────
+  // ── Banco de dados (SQLite via better-sqlite3) ────────────────────────
   // TODO: substituir stubs pela implementação real em src/main/db/
 
   ipcMain.handle(IPC.DB_GET_PRODUCTS, async () => {
@@ -51,7 +51,7 @@ export function registerIpcHandlers(ipcMain: IpcMain): void {
     markSaleSynced(id);
   });
 
-  // ── Hardware ──────────────────────────────────────────────────────────────
+  // ── Hardware ────────────────────────────────────────────────────────
 
   ipcMain.handle(IPC.SCALE_LIST_PORTS, async () => {
     return await SerialPort.list();
@@ -74,7 +74,7 @@ export function registerIpcHandlers(ipcMain: IpcMain): void {
     void data;
   });
 
-  // ── Sincronização ─────────────────────────────────────────────────────────
+  // ── Sincronização ───────────────────────────────────────────────────
 
   ipcMain.handle(IPC.SYNC_TRIGGER, async () => {
     // TODO: POST /sync com vendas pending, marcar synced após sucesso
