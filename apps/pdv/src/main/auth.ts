@@ -1,13 +1,25 @@
 import { ipcMain } from 'electron';
 import { IPC } from '../shared/ipc-channels';
+import crypto from 'crypto';
 
 const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
+export const CASHIER_ID = crypto.randomUUID();
+
 let authToken: string | null = null;
 let authUser: any | null = null;
+let cashierSessionId: string | null = null;
 
 export function getAuthToken(): string | null {
   return authToken;
+}
+
+export function getCashierSessionId(): string | null {
+  return cashierSessionId;
+}
+
+export function setCashierSessionId(id: string | null): void {
+  cashierSessionId = id;
 }
 
 export function initAuthHandlers() {
